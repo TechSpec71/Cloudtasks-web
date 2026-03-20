@@ -1,0 +1,182 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloudtasks | Admin Portal</title>
+    <style>
+        body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
+        .container { max-width: 800px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #30363d; text-align: left; }
+        button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-accept { background: #238636; color: white; }
+        .btn-reject { background: #da3633; color: white; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cloudtasks Applicant Manager</h2>
+        <div id="login-section">
+            <input type="text" id="adminUser" placeholder="Admin Username">
+            <input type="password" id="adminPass" placeholder="Admin Password">
+            <button onclick="loadApplicants()">Login</button>
+        </div>
+        <table id="adminTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="applicantList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadApplicants() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            
+            // This calls your server to get the list
+            const response = await fetch('/api/admin/applicants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUser: user, adminPass: pass })
+            });
+
+            if (response.ok) {
+                const applicants = await response.json();
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('adminTable').style.display = 'table';
+                const list = document.getElementById('applicantList');
+                list.innerHTML = '';
+                
+                applicants.forEach(app => {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${app.name}</td>
+                            <td>${app.email}</td>
+                            <td>${app.status}</td>
+                            <td>
+                                <button class="btn-accept" onclick="updateStatus('${app.email}', 'Accepted')">Accept</button>
+                                <button class="btn-reject" onclick="updateStatus('${app.email}', 'Rejected')">Reject</button>
+                            </td>
+                        </tr>`;
+                });
+            } else {
+                alert("Unauthorized!");
+            }
+        }
+
+        async function updateStatus(email, status) {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            const res = await fetch('/api/admin/update-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, status, adminUser: user, adminPass: pass })
+            });
+
+            if (res.ok) {
+                alert("User " + status);
+                loadApplicants(); // Refresh list
+            }
+        }
+    </script>
+</body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloudtasks | Admin Portal</title>
+    <style>
+        body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
+        .container { max-width: 800px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #30363d; text-align: left; }
+        button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-accept { background: #238636; color: white; }
+        .btn-reject { background: #da3633; color: white; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cloudtasks Applicant Manager</h2>
+        <div id="login-section">
+            <input type="text" id="adminUser" placeholder="Admin Username">
+            <input type="password" id="adminPass" placeholder="Admin Password">
+            <button onclick="loadApplicants()">Login</button>
+        </div>
+        <table id="adminTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="applicantList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadApplicants() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            
+            // This calls your server to get the list
+            const response = await fetch('/api/admin/applicants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUser: user, adminPass: pass })
+            });
+
+            if (response.ok) {
+                const applicants = await response.json();
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('adminTable').style.display = 'table';
+                const list = document.getElementById('applicantList');
+                list.innerHTML = '';
+                
+                applicants.forEach(app => {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${app.name}</td>
+                            <td>${app.email}</td>
+                            <td>${app.status}</td>
+                            <td>
+                                <button class="btn-accept" onclick="updateStatus('${app.email}', 'Accepted')">Accept</button>
+                                <button class="btn-reject" onclick="updateStatus('${app.email}', 'Rejected')">Reject</button>
+                            </td>
+                        </tr>`;
+                });
+            } else {
+                alert("Unauthorized!");
+            }
+        }
+
+        async function updateStatus(email, status) {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            const res = await fetch('/api/admin/update-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, status, adminUser: user, adminPass: pass })
+            });
+
+            if (res.ok) {
+                alert("User " + status);
+                loadApplicants(); // Refresh list
+            }
+        }
+    </script>
+</body>
+>>>>>>> 1fa4e9e265fa4fc73e3fd15b28fc4d058b184fd9
+</html>

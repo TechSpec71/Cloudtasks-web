@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudtasks | Loading</title>
+    <style>
+        body {
+            margin: 0;
+            /* Black Background as requested */
+            background: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+        }
+
+        /* 🔄 Spinning Logo Outline (instead of a default loader) */
+        .logo-spinner {
+            width: 80px;
+            height: 80px;
+            /* Use a simplified SVG of your logo outline or this CSS-only rotating border */
+            border: 4px solid transparent; 
+            border-top: 4px solid #6c5ce7; /* This represents the primary 'accent' of your outline */
+            border-radius: 50%; /* This shape is just a placeholder—for a true outline, we'd use your actual logo SVG */
+            animation: spin-outline 1.5s linear infinite; /* Rotating "as if loading" */
+            margin-bottom: 25px;
+        }
+
+        /* Define the rotation animation */
+        @keyframes spin-outline {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Blue Loading Text */
+        .loading-text {
+            /* Blue color as requested (we'll use a clear cyan-blue) */
+            color: #00bcd4;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="logo-spinner"></div>
+    
+    <p class="loading-text">Loading Cloudtasks</p>
+
+</body>
+</html>
