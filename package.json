@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -11,9 +12,7 @@
     "mongoose": "^9.3.1",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "nodemailer": "^8.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5"
+    "nodemailer": "^8.0.2"
   },
   "devDependencies": {},
   "scripts": {
