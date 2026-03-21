@@ -11,7 +11,7 @@
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             margin: 0; min-height: 100vh; color: white;
-            display: flex; flex-direction: column; /* Allows Nav at top, Grid below */
+            display: flex; flex-direction: column;
         }
 
         /* Top Navigation with Logo */
@@ -72,13 +72,23 @@
         /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; }
+        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; margin-bottom: 10px; }
         
         input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
         input:focus, select:focus { border-color: var(--primary); }
         
         .phone-row { display: flex; gap: 10px; }
         .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
+
+        /* File Upload Labels */
+        .upload-area {
+            display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d;
+            border-radius: 12px; text-align: center; cursor: pointer; margin: 15px 0;
+            transition: 0.3s; color: #b0b0b0;
+        }
+        .upload-area:hover { border-color: var(--primary); color: white; }
+        .upload-area i { font-size: 24px; margin-bottom: 8px; color: var(--primary); }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -113,7 +123,8 @@
                 <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
                 <h3>Identity Verification</h3>
                 <p>Secure your account with multi-factor authentication and official document logs.</p>
-                </div>
+                <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
+            </div>
 
             <div class="glass-card">
                 <div class="number-tag">04</div>
@@ -145,7 +156,6 @@
     <div id="eduModal" class="modal">
         <div class="modal-content">
             <h2>Education Profile</h2>
-            <p style="text-align:center">Select your highest level of completed education.</p>
             <select id="eduLevel">
                 <option value="">Select Education Level</option>
                 <option>High School / Secondary</option>
@@ -153,10 +163,31 @@
                 <option>Bachelor's Degree</option>
                 <option>Master's Degree</option>
                 <option>PhD / Doctorate</option>
-                <option>Other Certifications</option>
             </select>
             <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
             <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('eduModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Verify Identity</h2>
+            <p style="text-align:center; font-size: 13px; color: #b0b0b0;">Upload or take a photo of your documents.</p>
+            
+            <label class="upload-area" for="idFront">
+                <i class="fa-solid fa-id-card"></i><br>
+                <span>ID Card (Front Side)</span>
+                <input type="file" id="idFront" accept="image/*">
+            </label>
+
+            <label class="upload-area" for="selfie">
+                <i class="fa-solid fa-camera-retro"></i><br>
+                <span>Live Selfie</span>
+                <input type="file" id="selfie" accept="image/*">
+            </label>
+
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('idModal')">Submit Documents</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('idModal')">Cancel</button>
         </div>
     </div>
 
