@@ -7,34 +7,32 @@ const sgMail = require('@sendgrid/mail');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// 1. START THE SERVER IMMEDIATELY (Fixes Render connection error)
+app.listen(PORT, () => {
+  console.log(`✓ Server is live on port ${PORT}`);
+});
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
 let otps = {};
 
+// 2. CONNECT TO DATABASE IN BACKGROUND
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✓ CloudTasks Database Connected!'))
-  .catch(err => console.error('✕ Database Connection Error:', err));
+  .then(() => console.log('✓ MongoDB Connected'))
+  .catch(err => console.error('✕ MongoDB Error:', err));
 
-// Set SendGrid API Key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendOTP(email, otp) {
   const msg = {
     to: email,
-    from: 'ritawamaa71@gmail.com', // Must match your Verified Sender
+    from: 'ritawamaa71@gmail.com', 
     subject: 'CloudTasks - Your Verification Code',
     text: `Your verification code is: ${otp}`,
     html: `<strong>Your OTP code is: ${otp}</strong>`,
   };
-
-  try {
-    await sgMail.send(msg);
-    console.log("Email sent via SendGrid!");
-  } catch (error) {
-    console.error("SendGrid Error:", error.response ? error.response.body : error.message);
-    throw new Error("Email failed");
-  }
+  await sgMail.send(msg);
 }
 
 app.get('/', (req, res) => {
@@ -42,14 +40,14 @@ app.get('/', (req, res) => {
 });
 
 app.post('/send-otp', async (req, res) => {
-  const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  otps[email] = otp;
-
   try {
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otps[email] = otp;
     await sendOTP(email, otp);
     res.status(200).json({ message: "OTP sent!" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Email failed" });
   }
 });
@@ -58,12 +56,8 @@ app.post('/verify-otp', (req, res) => {
   const { email, otp } = req.body;
   if (otps[email] === otp) {
     delete otps[email];
-    res.status(200).json({ message: "Registration successful" });
+    res.status(200).json({ message: "Success" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
