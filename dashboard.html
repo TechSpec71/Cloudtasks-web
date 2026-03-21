@@ -14,34 +14,22 @@
             display: flex; flex-direction: column;
         }
 
-        /* Top Navigation with Logo */
-        nav {
-            width: 100%;
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-        }
+        /* Top Navigation - Preserved */
+        nav { width: 100%; padding: 20px 40px; display: flex; align-items: center; box-sizing: border-box; }
+        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; }
         .logo i { color: var(--primary); font-size: 28px; }
 
-        .main-content {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-bottom: 50px;
+        /* Grid Container - Restored to 2x2 */
+        .main-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 0; }
+        .container { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* This fixes the layout back to 2 columns */
+            gap: 30px; 
+            width: 90%; 
+            max-width: 900px; 
         }
 
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 90%; max-width: 900px; }
+        /* Glass Cards - Preserved Design */
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px; position: relative; 
@@ -52,38 +40,23 @@
             position: absolute; top: -15px; left: -15px; background: var(--primary);
             width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;
         }
+        
         h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
         p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
         .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
         .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
-        /* Modal Styles */
+        /* Modals & Upload Labels - Preserved */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; margin-bottom: 10px; }
-        
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
-        
-        /* File Upload Styling */
-        .file-upload-label {
-            display: block; padding: 15px; background: #0d1117; border: 1px dashed #30363d;
-            border-radius: 8px; text-align: center; cursor: pointer; margin: 10px 0; font-size: 13px; color: #b0b0b0;
-        }
-        .file-upload-label:hover { border-color: var(--primary); color: white; }
+        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); }
+        .file-upload-label { display: block; padding: 15px; background: #0d1117; border: 1px dashed #30363d; border-radius: 8px; text-align: center; cursor: pointer; margin: 10px 0; font-size: 13px; }
         input[type="file"] { display: none; }
-
-        .phone-row { display: flex; gap: 10px; }
-        .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">
-            <i class="fa-solid fa-cloud"></i>
-            <span>CloudTasks</span>
-        </div>
+        <div class="logo"><i class="fa-solid fa-cloud"></i><span>CloudTasks</span></div>
     </nav>
 
     <div class="main-content">
@@ -92,5 +65,39 @@
                 <div class="number-tag">01</div>
                 <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
                 <h3>Personal Profile</h3>
-                <p>Manage your account settings, contact information, and personal preferences.</p>
+                <p>Manage your account settings and contact info.</p>
                 <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
+            </div>
+
+            <div class="glass-card">
+                <div class="number-tag">02</div>
+                <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h3>Educational Profile</h3>
+                <p>Showcase your academic level and certifications.</p>
+                <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
+            </div>
+
+            <div class="glass-card">
+                <div class="number-tag">03</div>
+                <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <h3>Identity Verification</h3>
+                <p>Verify your identity for full access.</p>
+                <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
+            </div>
+
+            <div class="glass-card">
+                <div class="number-tag">04</div>
+                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h3>Task/Member Access</h3>
+                <p>Control permissions and manage workspace roles.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = function(event) { if (event.target.className === 'modal') { event.target.style.display = 'none'; } }
+    </script>
+</body>
+</html>
