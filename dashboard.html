@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudTasks - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #7c4dff; --bg: #f0f2f5; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            color: white;
+        }
+        .container { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 90%; max-width: 900px; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 40px;
+            position: relative;
+            transition: 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        
+        .number-tag {
+            position: absolute; top: -15px; left: -15px;
+            background: var(--primary); color: white;
+            width: 45px; height: 45px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+        }
+        h3 { margin: 15px 0 10px 0; color: #fff; letter-spacing: 1px; text-transform: uppercase; font-size: 18px; }
+        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin: 0; }
+        .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="glass-card">
+            <div class="number-tag">01</div>
+            <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
+            <h3>Personal Profile</h3>
+            <p>Manage your account settings, contact information, and personal preferences for your workspace.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="number-tag">02</div>
+            <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h3>Educational Profile</h3>
+            <p>Showcase your certifications, academic background, and skills relevant to CloudTasks projects.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="number-tag">04</div>
+            <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+            <h3>Task/Member Access</h3>
+            <p>Control project permissions and manage member roles within your secure collaboration environment.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="number-tag">03</div>
+            <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
+            <h3>Identity Verification</h3>
+            <p>Secure your account with multi-factor authentication and official document verification logs.</p>
+        </div>
+    </div>
+
+</body>
+</html>
