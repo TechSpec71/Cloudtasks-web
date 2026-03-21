@@ -14,22 +14,15 @@
             display: flex; flex-direction: column;
         }
 
-        /* Top Navigation - Preserved */
+        /* Top Navigation */
         nav { width: 100%; padding: 20px 40px; display: flex; align-items: center; box-sizing: border-box; }
         .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; }
         .logo i { color: var(--primary); font-size: 28px; }
 
-        /* Grid Container - Restored to 2x2 */
+        /* Grid Layout */
         .main-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 0; }
-        .container { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* This fixes the layout back to 2 columns */
-            gap: 30px; 
-            width: 90%; 
-            max-width: 900px; 
-        }
+        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 90%; max-width: 900px; }
 
-        /* Glass Cards - Preserved Design */
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px; position: relative; 
@@ -44,12 +37,35 @@
         h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
         p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
         .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
-        .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        
+        /* Button Styling */
+        .btn-update { 
+            background: var(--primary); color: white; border: none; padding: 12px 25px; 
+            border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; 
+            text-transform: uppercase; font-size: 12px;
+        }
+        .btn-update:hover { box-shadow: 0 0 20px var(--primary); opacity: 0.9; }
 
-        /* Modals & Upload Labels - Preserved */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); }
-        .file-upload-label { display: block; padding: 15px; background: #0d1117; border: 1px dashed #30363d; border-radius: 8px; text-align: center; cursor: pointer; margin: 10px 0; font-size: 13px; }
+        /* Modal Styles */
+        .modal { 
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); 
+        }
+        .modal-content { 
+            background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; 
+            width: 90%; max-width: 450px; border: 1px solid var(--primary); 
+            position: relative; animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        input, select { 
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
+            border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; 
+        }
+        .file-label {
+            display: block; padding: 20px; background: #0d1117; border: 1px dashed #30363d;
+            border-radius: 10px; text-align: center; cursor: pointer; margin: 10px 0;
+        }
         input[type="file"] { display: none; }
     </style>
 </head>
@@ -66,7 +82,7 @@
                 <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
                 <h3>Personal Profile</h3>
                 <p>Manage your account settings and contact info.</p>
-                <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
+                <button class="btn-update" onclick="openModal('personalModal')">Update Info</button>
             </div>
 
             <div class="glass-card">
@@ -74,7 +90,7 @@
                 <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <h3>Educational Profile</h3>
                 <p>Showcase your academic level and certifications.</p>
-                <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
+                <button class="btn-update" onclick="openModal('eduModal')">Update Education</button>
             </div>
 
             <div class="glass-card">
@@ -82,7 +98,7 @@
                 <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
                 <h3>Identity Verification</h3>
                 <p>Verify your identity for full access.</p>
-                <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
+                <button class="btn-update" onclick="openModal('idModal')">Verify Identity</button>
             </div>
 
             <div class="glass-card">
@@ -94,10 +110,61 @@
         </div>
     </div>
 
+    <div id="personalModal" class="modal">
+        <div class="modal-content">
+            <h2>Personal Info</h2>
+            <input type="text" placeholder="First Name as per ID">
+            <input type="text" placeholder="Last Name as per ID">
+            <select id="countrySelect" onchange="updatePrefix()">
+                <option value="">Select Country</option>
+                <option value="Kenya">Kenya</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+            </select>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="phonePrefix" style="width:80px" readonly placeholder="+">
+                <input type="text" placeholder="Phone Number">
+            </div>
+            <button class="btn-update" style="width:100%; margin-top:10px" onclick="closeModal('personalModal')">Save</button>
+        </div>
+    </div>
+
+    <div id="eduModal" class="modal">
+        <div class="modal-content">
+            <h2>Education Level</h2>
+            <select>
+                <option>High School</option>
+                <option>Diploma</option>
+                <option>Degree</option>
+            </select>
+            <button class="btn-update" style="width:100%; margin-top:10px" onclick="closeModal('eduModal')">Save</button>
+        </div>
+    </div>
+
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Identity Verification</h2>
+            <label class="file-label" for="idCard"><i class="fa-solid fa-id-card"></i> Upload ID Front</label>
+            <input type="file" id="idCard">
+            <label class="file-label" for="selfie"><i class="fa-solid fa-camera"></i> Upload Selfie</label>
+            <input type="file" id="selfie">
+            <button class="btn-update" style="width:100%; margin-top:10px" onclick="closeModal('idModal')">Submit</button>
+        </div>
+    </div>
+
     <script>
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        window.onclick = function(event) { if (event.target.className === 'modal') { event.target.style.display = 'none'; } }
+
+        function updatePrefix() {
+            const country = document.getElementById('countrySelect').value;
+            const prefixes = { 'Kenya': '+254', 'USA': '+1', 'UK': '+44' };
+            document.getElementById('phonePrefix').value = prefixes[country] || '';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') { event.target.style.display = 'none'; }
+        }
     </script>
 </body>
 </html>
