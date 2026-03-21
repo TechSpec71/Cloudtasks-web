@@ -10,8 +10,37 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: white;
+            margin: 0; min-height: 100vh; color: white;
+            display: flex; flex-direction: column;
         }
+
+        /* Top Navigation with Logo */
+        nav {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+        .logo i { color: var(--primary); font-size: 28px; }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 90%; max-width: 900px; }
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -32,114 +61,36 @@
         /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; }
+        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; margin-bottom: 10px; }
+        
         input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
-        input:focus, select:focus { border-color: var(--primary); }
+        
+        /* File Upload Styling */
+        .file-upload-label {
+            display: block; padding: 15px; background: #0d1117; border: 1px dashed #30363d;
+            border-radius: 8px; text-align: center; cursor: pointer; margin: 10px 0; font-size: 13px; color: #b0b0b0;
+        }
+        .file-upload-label:hover { border-color: var(--primary); color: white; }
+        input[type="file"] { display: none; }
+
         .phone-row { display: flex; gap: 10px; }
         .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="glass-card">
-            <div class="number-tag">01</div>
-            <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
-            <h3>Personal Profile</h3>
-            <p>Manage your account settings, contact information, and personal preferences.</p>
-            <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-cloud"></i>
+            <span>CloudTasks</span>
         </div>
+    </nav>
 
-        <div class="glass-card">
-            <div class="number-tag">02</div>
-            <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
-            <h3>Educational Profile</h3>
-            <p>Showcase your academic level and professional certifications relevant to CloudTasks.</p>
-            <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
-        </div>
-
-        <div class="glass-card">
-            <div class="number-tag">03</div>
-            <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
-            <h3>Identity Verification</h3>
-            <p>Secure your account with multi-factor authentication and official document logs.</p>
-        </div>
-
-        <div class="glass-card">
-            <div class="number-tag">04</div>
-            <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
-            <h3>Task/Member Access</h3>
-            <p>Control project permissions and manage member roles within your workspace.</p>
-        </div>
-    </div>
-
-    <div id="personalModal" class="modal">
-        <div class="modal-content">
-            <h2>Personal Info</h2>
-            <input type="text" placeholder="First Name as per ID">
-            <input type="text" placeholder="Last Name as per ID">
-            <select id="countrySelect" onchange="updatePrefix()">
-                <option value="">Select Country</option>
-                </select>
-            <div class="phone-row">
-                <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly>
-                <input type="text" placeholder="Phone Number">
-            </div>
-            <input type="email" placeholder="Email Address">
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
-            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('personalModal')">Cancel</button>
-        </div>
-    </div>
-
-    <div id="eduModal" class="modal">
-        <div class="modal-content">
-            <h2>Education Profile</h2>
-            <p style="text-align:center">Select your highest level of completed education.</p>
-            <select id="eduLevel">
-                <option value="">Select Education Level</option>
-                <option>High School / Secondary</option>
-                <option>Vocational / Diploma</option>
-                <option>Bachelor's Degree</option>
-                <option>Master's Degree</option>
-                <option>PhD / Doctorate</option>
-                <option>Other Certifications</option>
-            </select>
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
-            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('eduModal')">Cancel</button>
-        </div>
-    </div>
-
-    <script>
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // Expanded Global Country List
-        const countryData = [
-            {n: "Kenya", c: "+254"}, {n: "Uganda", c: "+256"}, {n: "Tanzania", c: "+255"}, 
-            {n: "Rwanda", c: "+250"}, {n: "Nigeria", c: "+234"}, {n: "South Africa", c: "+27"},
-            {n: "USA", c: "+1"}, {n: "United Kingdom", c: "+44"}, {n: "Canada", c: "+1"},
-            {n: "Australia", c: "+61"}, {n: "India", c: "+91"}, {n: "Germany", c: "+49"},
-            {n: "France", c: "+33"}, {n: "United Arab Emirates", c: "+971"}
-        ];
-
-        const select = document.getElementById('countrySelect');
-        countryData.sort((a,b) => a.n.localeCompare(b.n)).forEach(country => {
-            let opt = document.createElement('option');
-            opt.value = country.n;
-            opt.innerHTML = country.n;
-            select.appendChild(opt);
-        });
-
-        function updatePrefix() {
-            const country = countryData.find(c => c.n === select.value);
-            document.getElementById('phonePrefix').value = country ? country.c : '';
-        }
-
-        window.onclick = function(event) {
-            if (event.target.className === 'modal') {
-                event.target.style.display = 'none';
-            }
-        }
-    </script>
-</body>
-</html>
+    <div class="main-content">
+        <div class="container">
+            <div class="glass-card">
+                <div class="number-tag">01</div>
+                <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
+                <h3>Personal Profile</h3>
+                <p>Manage your account settings, contact information, and personal preferences.</p>
+                <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
