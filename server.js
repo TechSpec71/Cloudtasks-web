@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/send-otp', async (req, res) => {
+app.post('/api/send-otp', async (req, res) => {
   try {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -52,7 +52,7 @@ app.post('/send-otp', async (req, res) => {
   }
 });
 
-app.post('/verify-otp', (req, res) => {
+app.post('/api/verify-otp', (req, res) => {
   const { email, otp } = req.body;
   if (otps[email] === otp) {
     delete otps[email];
