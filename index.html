@@ -4,78 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Secure Workspace</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #1a1a2e;
-            --card: #16213e;
-            --accent: #7b61ff;
-            --text: #ffffff;
-        }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        nav {
-            width: 90%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .auth-container {
-            background: var(--card);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin-top: 50px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: none;
-            background: #0f3460;
-            color: white;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .toggle-text {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #bbb;
-        }
-        .toggle-text span {
-            color: var(--accent);
-            cursor: pointer;
-        }
+        :root { --primary: #7c4dff; --bg: #1a1a2e; --card: #16213e; --text: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        nav { width: 100%; padding: 20px; display: flex; justify-content: center; }
+        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .auth-container { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; margin-top: 50px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 20px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        .toggle-text { margin-top: 20px; font-size: 14px; color: #8b949e; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -87,9 +26,9 @@
         </div>
     </nav>
 
-    <div class="auth-container" id="auth-section">
+    <div class="auth-container" id="authForm">
         <h2 id="auth-title">Create Account</h2>
-        <p>Join CloudTasks to manage your goals</p>
+        <p id="auth-desc">Join CloudTasks to manage your goals</p>
         
         <input type="email" id="emailInput" placeholder="EMAIL ADDRESS">
         <input type="password" id="passInput" placeholder="PASSWORD">
@@ -101,38 +40,40 @@
         </div>
     </div>
 
+    <div class="auth-container" id="otpSection" style="display: none;">
+        <h2>Verify Your Email</h2>
+        <p>We've sent a 6-digit code to your email.</p>
+        
+        <input type="text" id="otpInput" placeholder="ENTER OTP CODE" maxlength="6">
+        
+        <button onclick="verifyOTP()">Verify & Finish</button>
+        
+        <div class="toggle-text" onclick="location.reload()">
+            <span>Back to Signup</span>
+        </div>
+    </div>
+
     <script>
         let isLoginMode = false;
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
-            const title = document.getElementById('auth-title');
-            const btn = document.getElementById('submit-btn');
-            const link = document.getElementById('toggle-link');
-
-            if (isLoginMode) {
-                title.innerText = "Login";
-                btn.innerText = "Login";
-                link.innerText = "Don't have an account? Sign up";
-            } else {
-                title.innerText = "Create Account";
-                btn.innerText = "Get Started";
-                link.innerText = "Already have an account? Click here";
-            }
+            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
+            document.getElementById('auth-desc').innerText = isLoginMode ? "Login to your workspace" : "Join CloudTasks to manage your goals";
+            document.getElementById('submit-btn').innerText = isLoginMode ? "Login" : "Get Started";
+            document.getElementById('toggle-link').innerText = isLoginMode ? "New here? Create an account" : "Already have an account? Click here";
         }
 
         async function handleAuth() {
             const email = document.getElementById('emailInput').value;
             const password = document.getElementById('passInput').value;
 
-            if (!email || !password) {
-                return alert("Please fill in all fields.");
-            }
+            if (!email || !password) return alert("Please fill in all fields.");
 
             const endpoint = isLoginMode ? '/api/login' : '/api/send-otp';
-            
+
             try {
-                const response = await fetch(endpoint, {                   
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -141,13 +82,42 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(isLoginMode ? "Login successful!" : "OTP sent! Check your email.");
+                    if (isLoginMode) {
+                        alert("Login successful!");
+                        window.location.href = "dashboard.html"; 
+                    } else {
+                        alert("OTP sent! Check your email.");
+                        // Hide signup, show OTP box
+                        document.getElementById('authForm').style.display = 'none';
+                        document.getElementById('otpSection').style.display = 'block';
+                    }
                 } else {
                     alert(data.message || "Something went wrong.");
                 }
             } catch (error) {
-                console.error("Auth Error:", error);
                 alert("Could not connect to the server.");
+            }
+        }
+
+        async function verifyOTP() {
+            const email = document.getElementById('emailInput').value;
+            const otp = document.getElementById('otpInput').value;
+
+            try {
+                const response = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+
+                if (response.ok) {
+                    alert("Registration successful!");
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Invalid OTP. Please try again.");
+                }
+            } catch (error) {
+                alert("Error verifying OTP.");
             }
         }
     </script>
