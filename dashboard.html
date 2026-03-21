@@ -37,8 +37,37 @@
             box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
         }
         h3 { margin: 15px 0 10px 0; color: #fff; letter-spacing: 1px; text-transform: uppercase; font-size: 18px; }
-        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin: 0; }
+        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin: 0; margin-bottom: 20px; }
         .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+
+        /* Update Button Styling */
+        .btn-update {
+            background: var(--primary); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-update:hover { opacity: 0.9; box-shadow: 0 0 15px var(--primary); }
+
+        /* Modal / Pop-up Window Styles */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px;
+            width: 90%; max-width: 450px; border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        .modal-content h2 { margin-top: 0; font-size: 22px; color: white; text-align: center; }
+        
+        input, select {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px;
+            border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+        .phone-row { display: flex; gap: 10px; align-items: center; }
+        .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -49,6 +78,7 @@
             <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
             <h3>Personal Profile</h3>
             <p>Manage your account settings, contact information, and personal preferences for your workspace.</p>
+            <button class="btn-update" onclick="openModal()">UPDATE INFO</button>
         </div>
 
         <div class="glass-card">
@@ -58,20 +88,83 @@
             <p>Showcase your certifications, academic background, and skills relevant to CloudTasks projects.</p>
         </div>
 
-      <div class="glass-card">
+        <div class="glass-card">
             <div class="number-tag">03</div>
             <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
             <h3>Identity Verification</h3>
             <p>Secure your account with multi-factor authentication and official document verification logs.</p>
         </div>
-      <div class="glass-card">
+
+        <div class="glass-card">
             <div class="number-tag">04</div>
             <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
             <h3>Task/Member Access</h3>
             <p>Control project permissions and manage member roles within your secure collaboration environment.</p>
         </div>
-        
     </div>
 
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <h2>Update Profile Info</h2>
+            
+            <input type="text" id="firstName" placeholder="First Name as per ID">
+            <input type="text" id="lastName" placeholder="Last Name as per ID">
+            
+            <select id="countrySelect" onchange="autoPrefix()">
+                <option value="">Select Country</option>
+                <option value="Kenya">Kenya</option>
+                <option value="Uganda">Uganda</option>
+                <option value="Tanzania">Tanzania</option>
+                <option value="Rwanda">Rwanda</option>
+                <option value="UK">United Kingdom</option>
+                <option value="USA">USA</option>
+            </select>
+
+            <div class="phone-row">
+                <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly title="Generated automatically">
+                <input type="text" id="phoneNumber" placeholder="Phone Number">
+            </div>
+            
+            <input type="email" id="profileEmail" placeholder="Email Address">
+            
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="saveProfile()">Save Changes</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background: transparent; border: 1px solid #444;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Modal Control Functions
+        function openModal() { document.getElementById('updateModal').style.display = 'block'; }
+        function closeModal() { document.getElementById('updateModal').style.display = 'none'; }
+
+        // Logic for Automatic Phone Prefix based on Country
+        function autoPrefix() {
+            const country = document.getElementById('countrySelect').value;
+            const prefixBox = document.getElementById('phonePrefix');
+            
+            const countryCodes = {
+                'Kenya': '+254',
+                'Uganda': '+256',
+                'Tanzania': '+255',
+                'Rwanda': '+250',
+                'UK': '+44',
+                'USA': '+1'
+            };
+
+            prefixBox.value = countryCodes[country] || '';
+        }
+
+        // Close modal if user clicks the dark background
+        window.onclick = function(event) {
+            const modal = document.getElementById('updateModal');
+            if (event.target == modal) { closeModal(); }
+        }
+
+        async function saveProfile() {
+            // We will connect this to your MongoDB later!
+            alert("Success: Information ready to be saved.");
+            closeModal();
+        }
+    </script>
 </body>
 </html>
