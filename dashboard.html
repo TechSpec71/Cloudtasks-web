@@ -15,7 +15,7 @@
             display: flex; flex-direction: column;
         }
 
-        /* Top Navigation */
+        /* Top Navigation with Logo */
         nav {
             width: 100%;
             padding: 20px 40px;
@@ -69,6 +69,11 @@
         .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
+        /* Payment Specific Styles */
+        .payment-badge {
+            background: #2ecc71; color: #000; font-size: 10px; padding: 2px 8px;
+            border-radius: 4px; font-weight: bold; margin-left: 10px; vertical-align: middle;
+        }
         .card-input-container {
             background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
             padding: 15px; margin: 10px 0; text-align: left;
@@ -82,6 +87,7 @@
         /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; margin-bottom: 10px; }
         
         input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
         input:focus, select:focus { border-color: var(--primary); }
@@ -95,6 +101,7 @@
             transition: 0.3s; color: #b0b0b0;
         }
         .upload-area:hover { border-color: var(--primary); color: white; }
+        .upload-area i { font-size: 24px; margin-bottom: 8px; color: var(--primary); }
         input[type="file"] { display: none; }
     </style>
 </head>
@@ -136,8 +143,7 @@
             <div class="glass-card">
                 <div class="number-tag">04</div>
                 <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
-                <h3>Task/Member Access</h3>
-                <p>Control project permissions and manage member roles within your workspace.</p>
+                <h3>Task/Member Access</h3> <p>Control project permissions and manage member roles within your workspace.</p>
                 <button class="btn-update" onclick="openModal('paymentModal')">GET ACCESS</button>
             </div>
         </div>
@@ -153,11 +159,46 @@
             </select>
             <div class="phone-row">
                 <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly>
-                <input type="text" id="phone" placeholder="Phone Number">
+                <input type="text" id="pNumber" placeholder="Phone Number">
             </div>
-            <input type="email" id="email" placeholder="Email Address">
+            <input type="email" id="uEmail" placeholder="Email Address">
             <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
             <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('personalModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="eduModal" class="modal">
+        <div class="modal-content">
+            <h2>Education Profile</h2>
+            <select id="eduLevel">
+                <option value="">Select Education Level</option>
+                <option>High School / Secondary</option>
+                <option>Vocational / Diploma</option>
+                <option>Bachelor's Degree</option>
+                <option>Master's Degree</option>
+                <option>PhD / Doctorate</option>
+            </select>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('eduModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Verify Identity</h2>
+            <p style="text-align:center; font-size: 13px; color: #b0b0b0;">Upload or take a photo of your documents.</p>
+            <label class="upload-area" for="idFront">
+                <i class="fa-solid fa-id-card"></i><br>
+                <span>ID Card (Front Side)</span>
+                <input type="file" id="idFront" accept="image/*">
+            </label>
+            <label class="upload-area" for="selfie">
+                <i class="fa-solid fa-camera-retro"></i><br>
+                <span>Live Selfie</span>
+                <input type="file" id="selfie" accept="image/*">
+            </label>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('idModal')">Submit Documents</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('idModal')">Cancel</button>
         </div>
     </div>
 
@@ -168,12 +209,9 @@
                 <h2>Secure Checkout</h2>
                 <p style="font-size: 13px; color: #b0b0b0;">Unlock Full Workspace & Task Access</p>
             </div>
-            <p style="text-align: center; color: #fff; font-size: 18px;">Access Fee: <b>KES 1,000</b></p>
-            
-            <button class="btn-update" id="payBtn" style="width:100%; padding: 15px; font-size: 16px; margin-top: 10px;" onclick="payWithPaystack()">
+            <button class="btn-update" id="payBtn" style="width:100%; padding: 15px; font-size: 16px;" onclick="processPaystack()">
                 CONFIRM & PAY WITH PAYSTACK
             </button>
-
             <div class="secure-footer">
                 <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
                 <span><i class="fa-solid fa-check-shield"></i> PCI Compliant</span>
@@ -182,83 +220,68 @@
         </div>
     </div>
 
-    <div id="eduModal" class="modal"><div class="modal-content"><h2>Education Profile</h2><button class="btn-update" style="width:100%" onclick="closeModal('eduModal')">Close</button></div></div>
-    <div id="idModal" class="modal"><div class="modal-content"><h2>Identity Verification</h2><button class="btn-update" style="width:100%" onclick="closeModal('idModal')">Close</button></div></div>
-
     <script>
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Country Logic
         const countryData = [
             {n: "Kenya", c: "+254"}, {n: "Uganda", c: "+256"}, {n: "Tanzania", c: "+255"}, 
-            {n: "USA", c: "+1"}, {n: "United Kingdom", c: "+44"}
+            {n: "Rwanda", c: "+250"}, {n: "Nigeria", c: "+234"}, {n: "South Africa", c: "+27"},
+            {n: "USA", c: "+1"}, {n: "United Kingdom", c: "+44"}, {n: "Canada", c: "+1"},
+            {n: "Australia", c: "+61"}, {n: "India", c: "+91"}, {n: "Germany", c: "+49"},
+            {n: "France", c: "+33"}, {n: "United Arab Emirates", c: "+971"}
         ];
+
         const select = document.getElementById('countrySelect');
-        countryData.forEach(country => {
+        countryData.sort((a,b) => a.n.localeCompare(b.n)).forEach(country => {
             let opt = document.createElement('option');
             opt.value = country.n; opt.innerHTML = country.n; select.appendChild(opt);
         });
+
         function updatePrefix() {
             const country = countryData.find(c => c.n === select.value);
             document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
-        // --- PAYSTACK INTEGRATION ---
-        function payWithPaystack() {
-            const userEmail = document.getElementById('email').value;
-            
-            if (!userEmail) {
-                alert("Please enter your Email in Personal Profile first!");
-                openModal('personalModal');
-                return;
-            }
+        // --- NEW PAYSTACK LOGIC ---
+        function processPaystack() {
+            const email = document.getElementById('uEmail').value;
+            if(!email) { alert("Enter email in Personal Info first."); return; }
 
-            const btn = document.getElementById('payBtn');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing...';
-            btn.disabled = true;
-
-            let handler = PaystackPop.setup({
-                key: 'pk_test_YOUR_PUBLIC_KEY', // Replace with your ACTUAL Paystack Public Key
-                email: userEmail,
-                amount: 1000 * 100, // 1000 KES in kobo
+            const handler = PaystackPop.setup({
+                key: 'pk_test_YOUR_KEY', // <--- PASTE YOUR KEY HERE
+                email: email,
+                amount: 100000, // KES 1000
                 currency: 'KES',
-                callback: function(response) {
-                    // Payment successful
-                    btn.innerHTML = 'PAYMENT SUCCESSFUL';
-                    sendDataToPHP(response.reference);
-                },
-                onClose: function() {
-                    btn.innerHTML = 'CONFIRM & PAY WITH PAYSTACK';
-                    btn.disabled = false;
-                    alert('Transaction cancelled.');
+                callback: function(res) {
+                    saveDetails(res.reference);
                 }
             });
             handler.openIframe();
         }
 
-        function sendDataToPHP(ref) {
-            const payload = {
-                reference: ref,
+        function saveDetails(ref) {
+            const info = {
+                ref: ref,
                 fname: document.getElementById('fname').value,
                 lname: document.getElementById('lname').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value
+                email: document.getElementById('uEmail').value,
+                phone: document.getElementById('pNumber').value
             };
 
             fetch('save_data.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.text())
-            .then(msg => {
-                alert("Verified! Reference: " + ref);
+                body: JSON.stringify(info)
+            }).then(() => {
+                alert("Payment Success! Reference: " + ref);
                 closeModal('paymentModal');
             });
         }
 
-        window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') event.target.style.display = 'none';
+        }
     </script>
 </body>
 </html>
