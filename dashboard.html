@@ -69,16 +69,6 @@
         .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
-        /* Payment Specific Styles */
-        .payment-badge {
-            background: #2ecc71; color: #000; font-size: 10px; padding: 2px 8px;
-            border-radius: 4px; font-weight: bold; margin-left: 10px; vertical-align: middle;
-        }
-        .card-input-container {
-            background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
-            padding: 15px; margin: 10px 0; text-align: left;
-        }
-        .card-row { display: flex; gap: 10px; margin-top: 10px; }
         .secure-footer {
             display: flex; justify-content: center; align-items: center;
             gap: 15px; margin-top: 15px; color: #666; font-size: 12px;
@@ -143,7 +133,8 @@
             <div class="glass-card">
                 <div class="number-tag">04</div>
                 <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
-                <h3>Task/Member Access</h3> <p>Control project permissions and manage member roles within your workspace.</p>
+                <h3>Task/Member Access</h3> 
+                <p>Control project permissions and manage member roles within your workspace.</p>
                 <button class="btn-update" onclick="openModal('paymentModal')">GET ACCESS</button>
             </div>
         </div>
@@ -243,18 +234,26 @@
             document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
-        // --- NEW PAYSTACK LOGIC ---
+        // --- UPDATED PAYSTACK LOGIC ---
         function processPaystack() {
             const email = document.getElementById('uEmail').value;
-            if(!email) { alert("Enter email in Personal Info first."); return; }
+            if(!email) { 
+                alert("Please enter your email in the 'Personal Info' (Section 01) before paying."); 
+                return; 
+            }
 
             const handler = PaystackPop.setup({
-                key: 'pk_test_YOUR_KEY', // <--- PASTE YOUR KEY HERE
+                // INTEGRATED TEST KEY
+                key: 'pk_test_f0dd72668dab52b95bdda3b', 
                 email: email,
-                amount: 100000, // KES 1000
+                amount: 100000, // KES 1000.00
                 currency: 'KES',
+                ref: 'CT-' + Math.floor((Math.random() * 1000000000) + 1),
                 callback: function(res) {
                     saveDetails(res.reference);
+                },
+                onClose: function() {
+                    alert('Transaction cancelled.');
                 }
             });
             handler.openIframe();
@@ -274,8 +273,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(info)
             }).then(() => {
-                alert("Payment Success! Reference: " + ref);
+                alert("Success! Your payment reference is: " + ref);
                 closeModal('paymentModal');
+            }).catch(err => {
+                console.error("Save failed:", err);
+                alert("Payment was successful, but there was an error saving to your database. Please keep your reference: " + ref);
             });
         }
 
