@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
+    <script src="https://js.paystack.co/v2/inline.js"></script>
+
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; }
         
@@ -13,7 +15,7 @@
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             margin: 0; min-height: 100vh; color: white;
-            display: flex; /* Sidebar and Content side-by-side */
+            display: flex;
         }
 
         /* --- SIDEBAR --- */
@@ -54,7 +56,7 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* --- YOUR ORIGINAL CARD STYLES --- */
+        /* --- CARD STYLES --- */
         .container { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -84,7 +86,7 @@
         }
         .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
-        /* --- MODAL STYLES (EXACTLY AS BEFORE) --- */
+        /* --- MODAL STYLES --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
@@ -93,6 +95,16 @@
         .upload-area { display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d; border-radius: 12px; text-align: center; cursor: pointer; margin: 15px 0; transition: 0.3s; color: #b0b0b0; }
         .upload-area:hover { border-color: var(--primary); color: white; }
         input[type="file"] { display: none; }
+        
+        /* TEST NOTICE BOX STYLE */
+        .test-notice {
+            background: rgba(124, 77, 255, 0.1); 
+            border: 1px dashed var(--primary); 
+            padding: 12px; border-radius: 10px; 
+            margin-bottom: 15px; font-size: 13px; 
+            color: #b0b0b0; line-height: 1.4;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -243,13 +255,19 @@
                 <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #2ecc71;"></i>
                 <h2>Secure Checkout</h2>
             </div>
+
+            <div class="test-notice">
+                <strong>TESTING INSTRUCTIONS:</strong><br>
+                Card: <code>4012 8888 8888 1881</code><br>
+                Expiry: 12/28 | CVV: 111
+            </div>
+
             <button class="btn-update" id="payBtn" style="width:100%; padding: 15px;" onclick="processPaystack()">CONFIRM & PAY WITH PAYSTACK</button>
             <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('paymentModal')">Cancel</button>
         </div>
     </div>
 
     <script>
-        // --- NEW VIEW SWITCHING LOGIC ---
         function showView(viewId, element) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
@@ -257,7 +275,6 @@
             element.classList.add('active');
         }
 
-        // --- YOUR ORIGINAL FUNCTIONS ---
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -273,13 +290,17 @@
             document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
+        // --- UPDATED PAYSTACK LOGIC ---
         function processPaystack() {
             const email = document.getElementById('uEmail').value;
-            if(!email) { alert("Enter email in Section 01 first."); return; }
+            if(!email) { alert("Please enter your email in the 'Personal Info' (Section 01) first."); return; }
+            
             const handler = PaystackPop.setup({
+                // CLEANED KEY: Ensuring no hidden characters
                 key: 'pk_test_f0dd72668dab52b95bdda3b', 
                 email: email,
-                amount: 100000, currency: 'KES',
+                amount: 100000, // KES 1000.00
+                currency: 'KES',
                 ref: 'CT-' + Math.floor((Math.random() * 1000000000) + 1),
                 callback: function(res) { saveDetails(res.reference); },
                 onClose: function() { alert('Transaction cancelled.'); }
@@ -294,7 +315,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(info)
             }).then(() => {
-                alert("Success! Reference: " + ref);
+                alert("Success! Your payment reference is: " + ref);
                 closeModal('paymentModal');
             });
         }
