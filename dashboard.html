@@ -13,19 +13,19 @@
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             margin: 0; min-height: 100vh; color: white;
-            display: flex; overflow: hidden;
+            display: flex; /* Sidebar and Content side-by-side */
         }
 
-        /* --- SIDEBAR SECTION --- */
+        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sidebar-w);
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex; flex-direction: column;
             padding: 30px 20px;
-            height: 100vh;
-            box-sizing: border-box;
+            height: 100vh; position: fixed;
+            box-sizing: border-box; z-index: 100;
         }
 
         .logo {
@@ -46,47 +46,53 @@
 
         /* --- MAIN CONTENT AREA --- */
         .main-content {
-            flex: 1; padding: 40px;
-            overflow-y: auto; height: 100vh;
+            flex: 1; margin-left: var(--sidebar-w);
+            padding: 40px; min-height: 100vh;
             box-sizing: border-box;
         }
 
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* --- PROFILE CARDS GRID --- */
+        /* --- YOUR ORIGINAL CARD STYLES --- */
         .container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 25px; width: 100%; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 30px; width: 100%; max-width: 900px;
         }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 30px;
-            position: relative; transition: 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px;
+            position: relative; transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         
         .number-tag {
-            position: absolute; top: -12px; left: -12px; background: var(--primary);
-            width: 35px; height: 35px; border-radius: 10px; display: flex; 
-            align-items: center; justify-content: center; font-weight: bold;
+            position: absolute; top: -15px; left: -15px; background: var(--primary);
+            width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; font-size: 18px;
         }
 
-        h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 16px; color: #fff; }
-        p { font-size: 13px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
-        .icon { font-size: 22px; color: var(--primary); }
+        h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
+        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
+        .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
 
         .btn-update {
             background: var(--primary); color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%;
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
         }
+        .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
-        /* Modal Styles remain as you had them */
+        /* --- MODAL STYLES (EXACTLY AS BEFORE) --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
+        .phone-row { display: flex; gap: 10px; }
+        .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
+        .upload-area { display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d; border-radius: 12px; text-align: center; cursor: pointer; margin: 15px 0; transition: 0.3s; color: #b0b0b0; }
+        .upload-area:hover { border-color: var(--primary); color: white; }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -107,7 +113,7 @@
             <i class="fa-solid fa-list-check"></i> Available Tasks
         </div>
         <div class="nav-item" onclick="showView('projectsView', this)">
-            <i class="fa-solid fa-diagram-project"></i> My Projects
+            <i class="fa-solid fa-spinner"></i> My Projects
         </div>
         <div class="nav-item" onclick="showView('walletView', this)">
             <i class="fa-solid fa-wallet"></i> My Wallet
@@ -120,8 +126,8 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #ff4d4d;">
-                <i class="fa-solid fa-right-from-bracket"></i> Log Out
+            <div class="nav-item" style="color: #e74c3c;">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
     </div>
@@ -130,17 +136,16 @@
         
         <div id="homeView" class="view-section active">
             <h1>Welcome to CloudTasks</h1>
-            <p>Ready for your pic! Upload it and I will help you display it here.</p>
+            <p>Your dashboard overview will appear here.</p>
         </div>
 
         <div id="profileView" class="view-section">
-            <h2 style="margin-bottom: 30px;">Account Setup & Verification</h2>
             <div class="container">
                 <div class="glass-card">
                     <div class="number-tag">01</div>
                     <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
                     <h3>Personal Profile</h3>
-                    <p>Manage your account settings and contact information.</p>
+                    <p>Manage your account settings, contact information, and preferences.</p>
                     <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
                 </div>
 
@@ -164,8 +169,8 @@
                     <div class="number-tag">04</div>
                     <div class="icon"><i class="fa-solid fa-building-columns"></i></div>
                     <h3>Payment Account Details</h3>
-                    <p>Set up where you want to receive your project earnings.</p>
-                    <button class="btn-update" onclick="openModal('bankModal')">SETUP PAYOUTS</button>
+                    <p>Set up your M-Pesa or Bank details to receive your earnings.</p>
+                    <button class="btn-update" onclick="openModal('bankModal')">UPDATE DETAILS</button>
                 </div>
 
                 <div class="glass-card">
@@ -181,43 +186,120 @@
         <div id="tasksView" class="view-section"><h1>Available Tasks</h1></div>
         <div id="projectsView" class="view-section"><h1>My Projects</h1></div>
         <div id="walletView" class="view-section"><h1>My Wallet</h1></div>
-        <div id="historyView" class="view-section"><h1>Transaction History</h1></div>
+        <div id="historyView" class="view-section"><h1>History</h1></div>
         <div id="supportView" class="view-section"><h1>Help & Support</h1></div>
+    </div>
 
+    <div id="personalModal" class="modal">
+        <div class="modal-content">
+            <h2>Personal Info</h2>
+            <input type="text" id="fname" placeholder="First Name as per ID">
+            <input type="text" id="lname" placeholder="Last Name as per ID">
+            <select id="countrySelect" onchange="updatePrefix()"><option value="">Select Country</option></select>
+            <div class="phone-row">
+                <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly>
+                <input type="text" id="pNumber" placeholder="Phone Number">
+            </div>
+            <input type="email" id="uEmail" placeholder="Email Address">
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
+        </div>
+    </div>
+
+    <div id="eduModal" class="modal">
+        <div class="modal-content">
+            <h2>Education Profile</h2>
+            <select id="eduLevel">
+                <option value="">Select Education Level</option>
+                <option>High School / Secondary</option>
+                <option>Vocational / Diploma</option>
+                <option>Bachelor's Degree</option>
+                <option>Master's Degree</option>
+            </select>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
+        </div>
+    </div>
+
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Verify Identity</h2>
+            <label class="upload-area" for="idFront"><i class="fa-solid fa-id-card"></i><br><span>ID Card (Front)</span><input type="file" id="idFront" accept="image/*"></label>
+            <label class="upload-area" for="selfie"><i class="fa-solid fa-camera-retro"></i><br><span>Live Selfie</span><input type="file" id="selfie" accept="image/*"></label>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('idModal')">Submit Documents</button>
+        </div>
     </div>
 
     <div id="bankModal" class="modal">
         <div class="modal-content">
-            <h2>Payment Details</h2>
-            <p style="text-align:center; color:#b0b0b0; font-size:12px;">Enter your M-Pesa or Bank details for receiving payments.</p>
-            <input type="text" placeholder="Account Name">
-            <select>
-                <option>M-Pesa</option>
-                <option>Equity Bank</option>
-                <option>KCB Bank</option>
-            </select>
+            <h2>Payout Details</h2>
+            <select><option>M-Pesa</option><option>Bank Transfer</option></select>
             <input type="text" placeholder="Account Number / Phone">
-            <button class="btn-update" onclick="closeModal('bankModal')">Save Details</button>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('bankModal')">Save Details</button>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div style="text-align:center; margin-bottom: 20px;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #2ecc71;"></i>
+                <h2>Secure Checkout</h2>
+            </div>
+            <button class="btn-update" id="payBtn" style="width:100%; padding: 15px;" onclick="processPaystack()">CONFIRM & PAY WITH PAYSTACK</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('paymentModal')">Cancel</button>
         </div>
     </div>
 
     <script>
-        // Navigation Logic: Swapping between Sidebar sections
+        // --- NEW VIEW SWITCHING LOGIC ---
         function showView(viewId, element) {
-            // Hide all sections
-            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
-            // Show selected section
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            
-            // Update sidebar active state
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             element.classList.add('active');
         }
 
+        // --- YOUR ORIGINAL FUNCTIONS ---
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Your existing Paystack & Country logic goes here...
+        const countryData = [{n: "Kenya", c: "+254"}, {n: "Uganda", c: "+256"}, {n: "Tanzania", c: "+255"}, {n: "Nigeria", c: "+234"}, {n: "USA", c: "+1"}, {n: "UK", c: "+44"}];
+        const select = document.getElementById('countrySelect');
+        countryData.forEach(country => {
+            let opt = document.createElement('option');
+            opt.value = country.n; opt.innerHTML = country.n; select.appendChild(opt);
+        });
+
+        function updatePrefix() {
+            const country = countryData.find(c => c.n === select.value);
+            document.getElementById('phonePrefix').value = country ? country.c : '';
+        }
+
+        function processPaystack() {
+            const email = document.getElementById('uEmail').value;
+            if(!email) { alert("Enter email in Section 01 first."); return; }
+            const handler = PaystackPop.setup({
+                key: 'pk_test_f0dd72668dab52b95bdda3b', 
+                email: email,
+                amount: 100000, currency: 'KES',
+                ref: 'CT-' + Math.floor((Math.random() * 1000000000) + 1),
+                callback: function(res) { saveDetails(res.reference); },
+                onClose: function() { alert('Transaction cancelled.'); }
+            });
+            handler.openIframe();
+        }
+
+        function saveDetails(ref) {
+            const info = { ref: ref, email: document.getElementById('uEmail').value };
+            fetch('save_data.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(info)
+            }).then(() => {
+                alert("Success! Reference: " + ref);
+                closeModal('paymentModal');
+            });
+        }
+
+        window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
     </script>
 </body>
 </html>
