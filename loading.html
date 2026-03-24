@@ -3,56 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudtasks | Loading</title>
+    <title>Cloudtasks | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             margin: 0;
-            /* Black Background as requested */
             background: #000000;
             color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Loading Screen Style (Retained) */
+        .loader-container {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            text-align: center;
+            width: 100%;
+            position: fixed;
+            background: #000;
+            z-index: 9999;
         }
 
-        /* 🔄 Spinning Logo Outline (instead of a default loader) */
         .logo-spinner {
             width: 80px;
             height: 80px;
-            /* Use a simplified SVG of your logo outline or this CSS-only rotating border */
             border: 4px solid transparent; 
-            border-top: 4px solid #6c5ce7; /* This represents the primary 'accent' of your outline */
-            border-radius: 50%; /* This shape is just a placeholder—for a true outline, we'd use your actual logo SVG */
-            animation: spin-outline 1.5s linear infinite; /* Rotating "as if loading" */
+            border-top: 4px solid #6c5ce7;
+            border-radius: 50%;
+            animation: spin-outline 1.5s linear infinite;
             margin-bottom: 25px;
         }
 
-        /* Define the rotation animation */
         @keyframes spin-outline {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Blue Loading Text */
         .loading-text {
-            /* Blue color as requested (we'll use a clear cyan-blue) */
             color: #00bcd4;
             font-size: 1.2rem;
             font-weight: 500;
             letter-spacing: 1px;
-            margin: 0;
+        }
+
+        /* Dashboard Styles */
+        .header {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+        }
+
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unverified { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid #e74c3c; }
+        .pending { background: rgba(243, 156, 18, 0.15); color: #f39c12; border: 1px solid #f39c12; }
+
+        /* The 'Get Access' Button */
+        .btn-get-access {
+            background: #00bcd4;
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-get-access:hover { background: #0097a7; }
+
+        /* Manual Payment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .payment-box {
+            background: #222;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background: #000;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+            box-sizing: border-box;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
-    
-    <div class="logo-spinner"></div>
-    
-    <p class="loading-text">Loading Cloudtasks</p>
 
+    <div id="loader" class="loader-container">
+        <div class="logo-spinner"></div>
+        <p class="loading-text">Loading Cloudtasks</p>
+    </div>
+
+    <div class="header">
+        <h2>Cloudtasks</h2>
+        <div id="accountStatus" class="status-badge unverified">
+            <i class="fa-solid fa-circle-xmark"></i> Unverified
+        </div>
+    </div>
+
+    <div style="margin-top: 100px; text-align: center;">
+        <h1>Ready to start?</h1>
+        <p>Unlock premium tasks by activating your account.</p>
+        <button class="btn-get-access" onclick="openPaymentModal()">GET ACCESS NOW</button>
+    </div>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-mobile-screen-button" style="font-size: 40px; color: #00bcd4;"></i>
+            <h3>Lipa na M-PESA</h3>
+            <p style="font-size: 14px; color: #ccc;">Pay <b>KES 1,000</b> to activate account</p>
+            
+            <div class="payment-box">
+                <p style="margin:0; font-size:12px;">Till Number / Phone</p>
+                <h2 style="margin:5px 0; color:#2ecc71;">[ENTER TILL HERE]</h2>
+                <p style="margin:0; font-size:11px; color:#888;">Name: RITA WAMBURU</p>
+            </div>
+
+            <p style="font-size: 13px;">Paste your <b>Transaction Code</b> below:</p>
+            <input type="text" id="mpesaCode" placeholder="E.g. RCL8WQ2K9S">
+            
+            <button class="btn-get-access" style="width: 100%;" onclick="submitCode()">VERIFY PAYMENT</button>
+            <p onclick="closeModal()" style="margin-top:15px; cursor:pointer; font-size:12px; color:#666;">Cancel</p>
+        </div>
+    </div>
+
+    <script>
+        // Simulate Loading Finish
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 2000);
+        });
+
+        function openPaymentModal() {
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function submitCode() {
+            const code = document.getElementById('mpesaCode').value.trim();
+            if (code.length < 8) {
+                alert("Please enter a valid M-Pesa transaction code.");
+                return;
+            }
+
+            // Update UI to show Pending
+            const badge = document.getElementById('accountStatus');
+            badge.className = "status-badge pending";
+            badge.innerHTML = '<i class="fa-solid fa-clock"></i> Verification Pending';
+
+            alert("Code submitted! We are verifying your payment. Your tasks will be unlocked shortly.");
+            closeModal();
+
+            // Here you would send 'code' to your Node.js backend using fetch()
+        }
+    </script>
 </body>
 </html>
