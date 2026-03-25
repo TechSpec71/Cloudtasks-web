@@ -171,8 +171,8 @@
             <p style="font-size: 14px; color: #aaa;">Please pay <b>KES 1,000</b> to the details below:</p>
             
             <div class="payment-box">
-                <p style="margin:0; font-size:12px; color: #888; text-transform: uppercase;">M-Pesa Number</p>
-                <h1 style="margin:8px 0; color:#2ecc71; letter-spacing: 1px;">0712345678</h1>
+                <p style="margin:0; font-size:12px; color: #888; text-transform: uppercase;">Till Number / Phone</p>
+                <h1 style="margin:8px 0; color:#2ecc71; letter-spacing: 1px;">[YOUR TILL HERE]</h1>
                 <p style="margin:0; font-size:12px; font-weight: bold;">RITA WAMBURU</p>
             </div>
 
@@ -188,6 +188,7 @@
         // Simulate Loading Finish
         window.addEventListener('load', () => {
             setTimeout(() => {
+                document.getElementById('loader').style.fadeOut = "slow";
                 document.getElementById('loader').style.display = 'none';
             }, 2000);
         });
