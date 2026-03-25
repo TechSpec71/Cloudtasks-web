@@ -6,116 +6,188 @@
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #7c4dff; --bg: #1a1a2e; }
+        :root { 
+            --primary: #7c4dff; 
+            --bg: #1a1a2e; 
+            --sidebar-w: 260px;
+            --mpesa-green: #2ecc71;
+        }
+
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            margin: 0; min-height: 100vh; color: white;
-            display: flex; flex-direction: column;
+            margin: 0;
+            min-height: 100vh; 
+            color: white;
+            display: flex; 
         }
 
-        /* Top Navigation */
-        nav { width: 100%; padding: 20px 40px; display: flex; align-items: center; box-sizing: border-box; }
-        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; }
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 50px;
+            color: white;
+            text-decoration: none;
+        }
         .logo i { color: var(--primary); font-size: 28px; }
 
-        .main-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px 0 50px 0; }
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 90%; max-width: 900px; }
+        .nav-links { list-style: none; padding: 0; margin: 0; }
+        .nav-links li { margin-bottom: 10px; }
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #b0b0b0;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content Positioning */
+        .main-wrapper {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 30px;
+            width: 100%; 
+            max-width: 900px; 
+        }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px; position: relative; 
-            transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 25px; 
+            padding: 40px;
+            position: relative; 
+            transition: 0.3s ease;
         }
         .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .number-tag { position: absolute; top: -15px; left: -15px; background: var(--primary); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
-
-        h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
-        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
-        .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
         
-        .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
+        .number-tag {
+            position: absolute; top: -15px; left: -15px; background: var(--primary);
+            width: 45px; height: 45px; border-radius: 12px; display: flex; 
+            align-items: center; justify-content: center; font-weight: bold;
+        }
 
-        /* Modal Styles */
+        .btn-update {
+            background: var(--primary); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
+        }
+
+        /* M-PESA Modal Styling */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
         
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
+        .mpesa-logo { color: var(--mpesa-green); font-size: 50px; margin-bottom: 10px; }
+        .mpesa-number { 
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; 
+            border: 1px dashed #444; margin: 20px 0;
+        }
+        .mpesa-number h2 { color: var(--mpesa-green); margin: 5px 0; letter-spacing: 2px; }
         
-        .mpesa-box { background: #0d1117; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px dashed #2ecc71; text-align: center; }
-        
-        .upload-area { display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d; border-radius: 12px; text-align: center; cursor: pointer; margin: 15px 0; color: #b0b0b0; }
-        input[type="file"] { display: none; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0d1117; color: white; box-sizing: border-box; }
+        .btn-verify { background: #00bcd4; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo"><i class="fa-solid fa-cloud"></i><span>CloudTasks</span></div>
-    </nav>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-cloud"></i>
+            <span>CloudTasks</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#"><i class="fa-solid fa-house"></i> Home Page</a></li>
+            <li><a href="#" class="active"><i class="fa-solid fa-user"></i> User Profile</a></li>
+            <li><a href="#"><i class="fa-solid fa-list-check"></i> Available Tasks</a></li>
+            <li><a href="#"><i class="fa-solid fa-diagram-project"></i> My Projects</a></li>
+            <li><a href="#"><i class="fa-solid fa-wallet"></i> My Wallet</a></li>
+            <li><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+            <li style="margin-top: auto;"><a href="#" style="color: #ff4d4d;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+    </div>
 
-    <div class="main-content">
+    <div class="main-wrapper">
+        <h1 style="align-self: flex-start; margin-bottom: 30px;">User Profile</h1>
         <div class="container">
             <div class="glass-card">
                 <div class="number-tag">01</div>
-                <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
                 <h3>Personal Profile</h3>
-                <p>Manage your account settings and contact information.</p>
-                <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
+                <p>Manage your account settings and contact info.</p>
+                <button class="btn-update">UPDATE INFO</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">02</div>
-                <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <h3>Educational Profile</h3>
-                <p>Showcase your academic level and professional certifications.</p>
-                <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
+                <p>Showcase your academic level and certifications.</p>
+                <button class="btn-update">UPDATE EDUCATION</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">03</div>
-                <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
                 <h3>Identity Verification</h3>
                 <p>Secure your account with official document logs.</p>
-                <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
+                <button class="btn-update">VERIFY IDENTITY</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">04</div>
-                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
-                <h3>Task/Member Access</h3> 
+                <div class="icon" style="font-size: 24px; color: var(--primary);"><i class="fa-solid fa-layer-group"></i></div>
+                <h3>Task/Member Access</h3>
                 <p>Unlock full workspace access and premium server-side projects.</p>
-                <button class="btn-update" onclick="openModal('paymentModal')">GET ACCESS</button>
+                <button class="btn-update" onclick="openModal('mpesaModal')">GET ACCESS</button>
             </div>
         </div>
     </div>
 
-    <div id="personalModal" class="modal"><div class="modal-content"><h2>Personal Info</h2><input type="text" id="fname" placeholder="First Name"><input type="text" id="lname" placeholder="Last Name"><input type="email" id="uEmail" placeholder="Email Address"><button class="btn-update" style="width:100%;" onclick="closeModal('personalModal')">Save Changes</button></div></div>
-    
-    <div id="eduModal" class="modal"><div class="modal-content"><h2>Education</h2><select id="eduLevel"><option>High School</option><option>Bachelor's Degree</option></select><button class="btn-update" style="width:100%;" onclick="closeModal('eduModal')">Save Education</button></div></div>
-
-    <div id="idModal" class="modal"><div class="modal-content"><h2>Verify Identity</h2><label class="upload-area">ID Front Side<input type="file"></label><button class="btn-update" style="width:100%;" onclick="closeModal('idModal')">Submit Documents</button></div></div>
-
-    <div id="paymentModal" class="modal">
+    <div id="mpesaModal" class="modal">
         <div class="modal-content">
-            <div style="text-align:center;">
-                <i class="fa-solid fa-mobile-screen-button" style="font-size: 40px; color: #2ecc71;"></i>
-                <h2>Lipa na M-PESA</h2>
-                <p style="font-size: 13px; color: #b0b0b0;">Pay <b>KES 1,000</b> to activate access</p>
+            <i class="fa-solid fa-mobile-screen mpesa-logo"></i>
+            <h2 style="margin: 0;">Lipa na M-PESA</h2>
+            <p style="color: #b0b0b0; font-size: 14px;">Please pay <b>KES 1,000</b> to the details below:</p>
+            
+            <div class="mpesa-number">
+                <small style="color: #888;">M-PESA NUMBER</small>
+                <h2>0712345678</h2>
+                <small style="font-weight: bold;">RITA WAMBURU</small>
             </div>
 
-            <div class="mpesa-box">
-                <p style="margin:0; font-size:11px; color: #888;">PAY TO NUMBER</p>
-                <h1 style="margin:5px 0; color:#2ecc71; letter-spacing: 1px;">0712345678</h1>
-                <p style="margin:0; font-size:12px; font-weight: bold;">RITA WAMBURU</p>
-            </div>
-
-            <p style="font-size: 13px; text-align: center;">Enter Transaction Code:</p>
-            <input type="text" id="mpesaCode" placeholder="E.G. RCL8WQ2K9S" maxlength="10">
-
-            <button class="btn-update" style="width:100%; margin-top:10px;" onclick="submitVerification()">VERIFY PAYMENT</button>
-            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('paymentModal')">Cancel</button>
+            <label style="font-size: 13px; display: block; text-align: left; margin-bottom: 5px;">Enter your <b>Transaction Code</b>:</p>
+            <input type="text" placeholder="E.G. RCL8WQ2K9S" id="transCode">
+            
+            <button class="btn-verify" onclick="verifyMpesa()">VERIFY PAYMENT</button>
+            <button onclick="closeModal('mpesaModal')" style="background:none; border:none; color:#888; cursor:pointer; margin-top:15px;">Cancel and Return</button>
         </div>
     </div>
 
@@ -123,14 +195,15 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function submitVerification() {
-            const code = document.getElementById('mpesaCode').value.trim();
+        function verifyMpesa() {
+            const code = document.getElementById('transCode').value;
             if(code.length < 8) {
-                alert("Please enter the valid M-Pesa code from your SMS.");
+                alert("Please enter a valid M-PESA transaction code.");
                 return;
             }
-            alert("Success! Code " + code + " submitted. Our team will verify and grant access within 30 minutes.");
-            closeModal('paymentModal');
+            // Add your manual verification logic here
+            alert("Payment code " + code + " submitted for manual verification.");
+            closeModal('mpesaModal');
         }
 
         window.onclick = function(event) {
