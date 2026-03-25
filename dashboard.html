@@ -6,188 +6,188 @@
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #7c4dff; 
-            --bg: #1a1a2e; 
-            --sidebar-w: 260px;
-            --mpesa-green: #2ecc71;
-        }
-
+        :root { --primary: #7c4dff; --bg: #1a1a2e; }
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            margin: 0;
-            min-height: 100vh; 
-            color: white;
-            display: flex; 
+            margin: 0; min-height: 100vh; color: white;
+            display: flex; flex-direction: column;
         }
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        /* Top Navigation with Logo */
+        nav {
+            width: 100%;
+            padding: 20px 40px;
             display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-            height: 100vh;
-            position: fixed;
+            align-items: center;
+            box-sizing: border-box;
         }
-
         .logo {
             font-size: 24px;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 50px;
             color: white;
             text-decoration: none;
         }
         .logo i { color: var(--primary); font-size: 28px; }
 
-        .nav-links { list-style: none; padding: 0; margin: 0; }
-        .nav-links li { margin-bottom: 10px; }
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #b0b0b0;
-            text-decoration: none;
-            padding: 12px 15px;
-            border-radius: 12px;
-            transition: 0.3s;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Main Content Positioning */
-        .main-wrapper {
-            margin-left: var(--sidebar-w);
+        .main-content {
             flex: 1;
-            padding: 40px;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            padding: 20px 0 50px 0;
         }
-
+        
+        /* Grid Layout - Fixed at 2x2 */
         .container { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 30px;
-            width: 100%; 
+            gap: 30px; 
+            width: 90%; 
             max-width: 900px; 
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 25px; 
-            padding: 40px;
-            position: relative; 
-            transition: 0.3s ease;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px; position: relative; 
+            transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         
         .number-tag {
             position: absolute; top: -15px; left: -15px; background: var(--primary);
-            width: 45px; height: 45px; border-radius: 12px; display: flex; 
-            align-items: center; justify-content: center; font-weight: bold;
+            width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;
         }
 
-        .btn-update {
-            background: var(--primary); color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
-        }
+        h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
+        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
+        .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+        
+        .btn-update { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
 
-        /* M-PESA Modal Styling */
+        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
+        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-content h2 { margin-top: 0; font-size: 22px; text-align: center; margin-bottom: 10px; }
         
-        .mpesa-logo { color: var(--mpesa-green); font-size: 50px; margin-bottom: 10px; }
-        .mpesa-number { 
-            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; 
-            border: 1px dashed #444; margin: 20px 0;
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+        
+        .phone-row { display: flex; gap: 10px; }
+        .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); }
+
+        /* File Upload Labels */
+        .upload-area {
+            display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d;
+            border-radius: 12px; text-align: center; cursor: pointer; margin: 15px 0;
+            transition: 0.3s; color: #b0b0b0;
         }
-        .mpesa-number h2 { color: var(--mpesa-green); margin: 5px 0; letter-spacing: 2px; }
-        
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0d1117; color: white; box-sizing: border-box; }
-        .btn-verify { background: #00bcd4; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .upload-area:hover { border-color: var(--primary); color: white; }
+        .upload-area i { font-size: 24px; margin-bottom: 8px; color: var(--primary); }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav>
         <div class="logo">
             <i class="fa-solid fa-cloud"></i>
             <span>CloudTasks</span>
         </div>
-        <ul class="nav-links">
-            <li><a href="#"><i class="fa-solid fa-house"></i> Home Page</a></li>
-            <li><a href="#" class="active"><i class="fa-solid fa-user"></i> User Profile</a></li>
-            <li><a href="#"><i class="fa-solid fa-list-check"></i> Available Tasks</a></li>
-            <li><a href="#"><i class="fa-solid fa-diagram-project"></i> My Projects</a></li>
-            <li><a href="#"><i class="fa-solid fa-wallet"></i> My Wallet</a></li>
-            <li><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
-            <li style="margin-top: auto;"><a href="#" style="color: #ff4d4d;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-        </ul>
-    </div>
+    </nav>
 
-    <div class="main-wrapper">
-        <h1 style="align-self: flex-start; margin-bottom: 30px;">User Profile</h1>
+    <div class="main-content">
         <div class="container">
             <div class="glass-card">
                 <div class="number-tag">01</div>
+                <div class="icon"><i class="fa-solid fa-user-gear"></i></div>
                 <h3>Personal Profile</h3>
-                <p>Manage your account settings and contact info.</p>
-                <button class="btn-update">UPDATE INFO</button>
+                <p>Manage your account settings, contact information, and personal preferences.</p>
+                <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">02</div>
+                <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <h3>Educational Profile</h3>
-                <p>Showcase your academic level and certifications.</p>
-                <button class="btn-update">UPDATE EDUCATION</button>
+                <p>Showcase your academic level and professional certifications relevant to CloudTasks.</p>
+                <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">03</div>
+                <div class="icon"><i class="fa-solid fa-id-card-clip"></i></div>
                 <h3>Identity Verification</h3>
-                <p>Secure your account with official document logs.</p>
-                <button class="btn-update">VERIFY IDENTITY</button>
+                <p>Secure your account with multi-factor authentication and official document logs.</p>
+                <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
             </div>
 
             <div class="glass-card">
                 <div class="number-tag">04</div>
-                <div class="icon" style="font-size: 24px; color: var(--primary);"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
                 <h3>Task/Member Access</h3>
-                <p>Unlock full workspace access and premium server-side projects.</p>
-                <button class="btn-update" onclick="openModal('mpesaModal')">GET ACCESS</button>
+                <p>Control project permissions and manage member roles within your workspace.</p>
             </div>
         </div>
     </div>
 
-    <div id="mpesaModal" class="modal">
+    <div id="personalModal" class="modal">
         <div class="modal-content">
-            <i class="fa-solid fa-mobile-screen mpesa-logo"></i>
-            <h2 style="margin: 0;">Lipa na M-PESA</h2>
-            <p style="color: #b0b0b0; font-size: 14px;">Please pay <b>KES 1,000</b> to the details below:</p>
-            
-            <div class="mpesa-number">
-                <small style="color: #888;">M-PESA NUMBER</small>
-                <h2>0712345678</h2>
-                <small style="font-weight: bold;">RITA WAMBURU</small>
+            <h2>Personal Info</h2>
+            <input type="text" placeholder="First Name as per ID">
+            <input type="text" placeholder="Last Name as per ID">
+            <select id="countrySelect" onchange="updatePrefix()">
+                <option value="">Select Country</option>
+            </select>
+            <div class="phone-row">
+                <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly>
+                <input type="text" placeholder="Phone Number">
             </div>
+            <input type="email" placeholder="Email Address">
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('personalModal')">Cancel</button>
+        </div>
+    </div>
 
-            <label style="font-size: 13px; display: block; text-align: left; margin-bottom: 5px;">Enter your <b>Transaction Code</b>:</p>
-            <input type="text" placeholder="E.G. RCL8WQ2K9S" id="transCode">
+    <div id="eduModal" class="modal">
+        <div class="modal-content">
+            <h2>Education Profile</h2>
+            <select id="eduLevel">
+                <option value="">Select Education Level</option>
+                <option>High School / Secondary</option>
+                <option>Vocational / Diploma</option>
+                <option>Bachelor's Degree</option>
+                <option>Master's Degree</option>
+                <option>PhD / Doctorate</option>
+            </select>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('eduModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Verify Identity</h2>
+            <p style="text-align:center; font-size: 13px; color: #b0b0b0;">Upload or take a photo of your documents.</p>
             
-            <button class="btn-verify" onclick="verifyMpesa()">VERIFY PAYMENT</button>
-            <button onclick="closeModal('mpesaModal')" style="background:none; border:none; color:#888; cursor:pointer; margin-top:15px;">Cancel and Return</button>
+            <label class="upload-area" for="idFront">
+                <i class="fa-solid fa-id-card"></i><br>
+                <span>ID Card (Front Side)</span>
+                <input type="file" id="idFront" accept="image/*">
+            </label>
+
+            <label class="upload-area" for="selfie">
+                <i class="fa-solid fa-camera-retro"></i><br>
+                <span>Live Selfie</span>
+                <input type="file" id="selfie" accept="image/*">
+            </label>
+
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('idModal')">Submit Documents</button>
+            <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('idModal')">Cancel</button>
         </div>
     </div>
 
@@ -195,19 +195,31 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function verifyMpesa() {
-            const code = document.getElementById('transCode').value;
-            if(code.length < 8) {
-                alert("Please enter a valid M-PESA transaction code.");
-                return;
-            }
-            // Add your manual verification logic here
-            alert("Payment code " + code + " submitted for manual verification.");
-            closeModal('mpesaModal');
+        const countryData = [
+            {n: "Kenya", c: "+254"}, {n: "Uganda", c: "+256"}, {n: "Tanzania", c: "+255"}, 
+            {n: "Rwanda", c: "+250"}, {n: "Nigeria", c: "+234"}, {n: "South Africa", c: "+27"},
+            {n: "USA", c: "+1"}, {n: "United Kingdom", c: "+44"}, {n: "Canada", c: "+1"},
+            {n: "Australia", c: "+61"}, {n: "India", c: "+91"}, {n: "Germany", c: "+49"},
+            {n: "France", c: "+33"}, {n: "United Arab Emirates", c: "+971"}
+        ];
+
+        const select = document.getElementById('countrySelect');
+        countryData.sort((a,b) => a.n.localeCompare(b.n)).forEach(country => {
+            let opt = document.createElement('option');
+            opt.value = country.n;
+            opt.innerHTML = country.n;
+            select.appendChild(opt);
+        });
+
+        function updatePrefix() {
+            const country = countryData.find(c => c.n === select.value);
+            document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
         window.onclick = function(event) {
-            if (event.target.className === 'modal') event.target.style.display = 'none';
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
         }
     </script>
 </body>
