@@ -3,117 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudtasks | Membership Hub</title>
+    <title>Cloudtasks | Membership</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ALL PREVIOUS PAYSTACK STYLES ARE DELETED */
-        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .header { width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; box-sizing: border-box; }
-        
-        .btn-get-access { background: #00bcd4; color: black; border: none; padding: 15px 35px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 50px; }
+        /* UNIQUE STYLING TO OVERRIDE ALL CACHE */
+        body { margin: 0; background: #000000 !important; color: #ffffff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .top-nav { width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; box-sizing: border-box; }
+        .access-trigger { background: #00bcd4; color: #000; border: none; padding: 16px 40px; font-weight: 800; border-radius: 4px; cursor: pointer; margin-top: 60px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* 🏆 THE NEW MEMBERSHIP HUB (Replaces Paystack Modal) */
-        .hub-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 99999; }
-        .hub-content { background: #111; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid #333; text-align: center; box-shadow: 0 0 30px rgba(0,188,212,0.1); }
+        /* THE BRAND NEW MEMBERSHIP OVERLAY */
+        #membershipOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; z-index: 999999; padding: 20px; box-sizing: border-box; }
+        .hub-card { background: #0a0a0a; padding: 35px; border-radius: 12px; width: 100%; max-width: 420px; border: 1px solid #222; text-align: center; }
         
-        /* Enter Key Section */
-        .key-section { position: relative; margin-bottom: 30px; }
-        .key-input { width: 100%; padding: 15px; background: #1a1a1a; border: 1px solid #444; color: #00bcd4; border-radius: 10px; box-sizing: border-box; font-family: monospace; font-size: 1.1rem; text-align: center; }
-        .send-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00bcd4; cursor: pointer; font-size: 1.3rem; border: none; background: none; }
+        /* Key Input Area */
+        .key-entry-wrapper { position: relative; margin: 25px 0; }
+        .key-field { width: 100%; padding: 16px; background: #000; border: 1px solid #333; color: #00bcd4; border-radius: 6px; box-sizing: border-box; font-family: 'Courier New', monospace; font-size: 1.1rem; text-align: center; outline: none; }
+        .key-submit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00bcd4; background: none; border: none; cursor: pointer; font-size: 1.2rem; }
 
-        /* Global Illusion Options */
-        .payment-option { width: 100%; padding: 12px 20px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s; }
-        .payment-option:hover { background: #222; border-color: #00bcd4; }
-        .payment-option img { height: 18px; }
+        /* Global Options Buttons */
+        .global-btn { width: 100%; padding: 14px 20px; background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 0.9rem; }
+        .global-btn:hover { border-color: #00bcd4; background: #161616; }
+        .global-btn img { height: 18px; }
 
-        /* M-Pesa Hidden Details */
-        #mpesaBox { display: none; background: #002b2b; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #00bcd4; animation: slideDown 0.3s ease; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* M-Pesa Info (Local Only) */
+        #mpesaInfoBox { display: none; background: #001a1a; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #00bcd4; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 style="margin:0; letter-spacing: -1px;">Cloudtasks</h2>
-        <div style="color:#e74c3c; font-size: 12px; font-weight: bold; border: 1px solid #e74c3c; padding: 4px 10px; border-radius: 20px;">
-            <i class="fa-solid fa-lock"></i> ACCOUNT LOCKED
-        </div>
+    <div class="top-nav">
+        <h2 style="margin:0; font-weight: 900;">CLOUDTASKS</h2>
+        <span style="border: 1px solid #ff4d4d; color: #ff4d4d; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: bold;">LOCKED</span>
     </div>
 
-    <div style="text-align: center; margin-top: 10vh;">
-        <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: #00bcd4; margin-bottom: 20px;"></i>
-        <h1>Premium Access Required</h1>
-        <p style="color: #666; max-width: 300px; margin: 0 auto;">Join the world-class server-side network.</p>
-        <button class="btn-get-access" onclick="openHub()">GET ACCESS NOW</button>
+    <div style="text-align: center; margin-top: 15vh;">
+        <i class="fa-solid fa-fingerprint" style="font-size: 80px; color: #00bcd4; margin-bottom: 25px;"></i>
+        <h1 style="margin:0;">Verification Required</h1>
+        <p style="color: #444; margin-top: 10px;">Secure server access portal.</p>
+        <button class="access-trigger" onclick="toggleOverlay(true)">Get Access Now</button>
     </div>
 
-    <div id="hubModal" class="hub-modal">
-        <div class="hub-content">
-            <h2 style="margin-top:0;">Membership Hub</h2>
+    <div id="membershipOverlay">
+        <div class="hub-card">
+            <h2 style="margin:0 0 10px 0; font-weight: 900;">Membership Hub</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 25px;">Acquire annual key for <b>$25.00 USD</b></p>
             
-            <div class="key-section">
-                <input type="text" id="memberKey" class="key-input" placeholder="Enter Membership Key">
-                <button class="send-btn" onclick="verifyKey()"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="key-entry-wrapper">
+                <input type="text" id="userSecretKey" class="key-field" placeholder="Enter Membership Key">
+                <button class="key-submit" onclick="checkUserKey()"><i class="fa-solid fa-arrow-right-long"></i></button>
             </div>
 
-            <div style="margin: 20px 0; color: #444; font-size: 10px; letter-spacing: 2px;">OR ACQUIRE ACCESS</div>
-            <p style="font-size: 13px; color: #888; margin-bottom: 15px;">Membership Key: <b>$25.00 / Annum</b></p>
+            <div style="margin: 30px 0 20px 0; font-size: 9px; color: #333; letter-spacing: 3px;">PAYMENT GATEWAY</div>
 
-            <div class="payment-option" onclick="toggleMpesa()" style="border-left: 4px solid #2ecc71;">
-                <span>Mobile Money (Local Merchant)</span>
-                <i class="fa-solid fa-mobile-screen" style="color: #2ecc71;"></i>
+            <div class="global-btn" onclick="toggleMpesaDetails()" style="border-left: 3px solid #2ecc71;">
+                <span>Mobile Money (Local)</span>
+                <i class="fa-solid fa-receipt" style="color: #2ecc71;"></i>
             </div>
             
-            <div id="mpesaBox">
-                <p style="margin:0; font-size: 11px; color: #00bcd4;">LIPA NA M-PESA PAYBILL</p>
-                <p style="margin:5px 0; font-weight: bold;">Business No: 542542</p>
-                <p style="margin:0; font-weight: bold;">Account No: 05508726426150</p>
+            <div id="mpesaInfoBox">
+                <p style="margin:0; font-size: 10px; color: #00bcd4; font-weight: bold;">LOCAL MERCHANT DETAILS</p>
+                <p style="margin:10px 0 5px 0; font-size: 14px;">Paybill: <b>542542</b></p>
+                <p style="margin:0; font-size: 14px;">Account: <b>05508726426150</b></p>
             </div>
 
-            <div class="payment-option" onclick="regionError('PayPal')">
+            <div class="global-btn" onclick="showGatewayError('PayPal')">
                 <span>PayPal</span>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
             </div>
-            <div class="payment-option" onclick="regionError('Visa/Mastercard')">
+            <div class="global-btn" onclick="showGatewayError('Visa/Mastercard')">
                 <span>Visa / Mastercard</span>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
             </div>
-            <div class="payment-option" onclick="regionError('Apple Pay')">
+            <div class="global-btn" onclick="showGatewayError('Apple Pay')">
                 <span>Apple Pay</span>
-                <i class="fa-brands fa-apple-pay" style="font-size: 25px;"></i>
-            </div>
-            <div class="payment-option" onclick="regionError('Skrill / Alipay')">
-                <span>Skrill / Alipay</span>
-                <i class="fa-solid fa-globe" style="color: #6c5ce7;"></i>
+                <i class="fa-brands fa-apple-pay" style="font-size: 26px;"></i>
             </div>
 
-            <p onclick="closeHub()" style="margin-top: 20px; color: #444; cursor: pointer; font-size: 12px;">Go Back</p>
+            <p onclick="toggleOverlay(false)" style="margin-top: 25px; color: #333; cursor: pointer; font-size: 12px; font-weight: bold;">CLOSE HUB</p>
         </div>
     </div>
 
     <script>
-        function openHub() { document.getElementById('hubModal').style.display = 'flex'; }
-        function closeHub() { document.getElementById('hubModal').style.display = 'none'; }
+        function toggleOverlay(show) {
+            document.getElementById('membershipOverlay').style.display = show ? 'flex' : 'none';
+        }
 
-        function toggleMpesa() {
-            const box = document.getElementById('mpesaBox');
+        function toggleMpesaDetails() {
+            const box = document.getElementById('mpesaInfoBox');
             box.style.display = (box.style.display === 'block') ? 'none' : 'block';
         }
 
-        function verifyKey() {
-            const key = document.getElementById('memberKey').value.trim();
-            if (key === "ABKNOVA:C433") {
-                alert("SORRY! This Key is experiencing an overload at the moment. Please try again later.");
-            } else if (key === "") {
-                alert("Please enter a key.");
+        function checkUserKey() {
+            const k = document.getElementById('userSecretKey').value.trim();
+            if (k === "ABKNOVA:C433") {
+                alert("SYSTEM ERROR: This Membership Key is currently experiencing an overload. Please contact support or try a new key.");
+            } else if (k === "") {
+                alert("Input Required: Please enter your key.");
             } else {
-                alert("INVALID KEY: This membership key does not exist.");
+                alert("VERIFICATION FAILED: The provided key is invalid.");
             }
         }
 
-        function regionError(method) {
-            alert("SECURITY NOTICE: The " + method + " gateway is currently unavailable in your region. Please proceed with the Local Merchant (Mobile Money) option.");
+        function showGatewayError(name) {
+            alert("REGION LOCK: " + name + " processing is unavailable in your current location. Please use the 'Mobile Money (Local)' option to proceed.");
         }
     </script>
 </body>
