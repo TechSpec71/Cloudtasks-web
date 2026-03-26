@@ -6,8 +6,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const sgMail = require('@sendgrid/mail');
-const multer = require('multer'); // Added for ID photo uploads
+const multer = require('multer');
 const fs = require('fs');
+const cors = require('cors'); // ADDED THIS
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -27,36 +28,39 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Middleware
+app.use(cors()); // ADDED THIS - Essential for your friend to connect
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
-app.use('/uploads', express.static('uploads')); // Makes ID photos viewable via URL
+app.use('/uploads', express.static('uploads'));
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
-// Expanded User Model to capture ALL details
+// User Model
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullName: String,
   phoneNumber: String,
-  idPhotoPath: String,    // Stores the path to their uploaded ID
-  paymentAccount: String, // The account they paid from
-  paymentRef: String,     // M-Pesa/Bank transaction code
+  idPhotoPath: String,
+  paymentAccount: String,
+  paymentRef: String,
   isVerified: { type: Boolean, default: false },
   status: { type: String, default: 'Pending' },
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 // --- ROUTES ---
 
-// 1. Registration with Profile Details & ID Upload
+// 1. Registration
 app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   try {
     const { email, password, fullName, phoneNumber, paymentAccount, paymentRef } = req.body;
@@ -83,7 +87,7 @@ app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   }
 });
 
-// 2. Login (Remembers for 30 days)
+// 2. Login
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -100,12 +104,9 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// --- ADMIN ROUTES ---
-
-// 3. Admin: Fetch ALL User Details
+// 3. Admin: Fetch Users
 app.get('/api/admin/users', async (req, res) => {
   try {
-    // You can add a check here for admin credentials if needed
     const users = await User.find({}).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
@@ -113,7 +114,7 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// 4. Admin: Verify Payment & Approve User
+// 4. Admin: Update Status
 app.post('/api/admin/update-status', async (req, res) => {
   try {
     const { email, status } = req.body;
@@ -126,7 +127,6 @@ app.post('/api/admin/update-status', async (req, res) => {
   }
 });
 
-// Serve Home
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
