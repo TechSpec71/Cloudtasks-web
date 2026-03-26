@@ -41,12 +41,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
 
-// --- UPDATED DATABASE CONNECTION ---
-// Using modern options for the legacy connection string
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+// --- UPDATED DATABASE CONNECTION (Fixed for Modern Mongoose) ---
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
@@ -93,7 +89,7 @@ app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   }
 });
 
-// --- NEW: UPDATE PROFILE ROUTE ---
+// --- UPDATE PROFILE ROUTE ---
 app.post('/api/user/update-profile', upload.single('idPhoto'), async (req, res) => {
   try {
     const { email, fullName, phoneNumber, education, paymentMethod, payoutAccount, paymentRef } = req.body;
