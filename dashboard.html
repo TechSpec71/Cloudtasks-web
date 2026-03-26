@@ -145,7 +145,7 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #e74c3c;">
+            <div class="nav-item" style="color: #e74c3c;" onclick="handleLogout()">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
@@ -224,8 +224,8 @@
                 <input type="text" id="phonePrefix" class="prefix-box" placeholder="Prefix" readonly>
                 <input type="text" id="pNumber" placeholder="Phone Number">
             </div>
-            <input type="email" id="uEmail" placeholder="Email Address">
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
+            <input type="email" id="uEmail" placeholder="Email Address (Confirm your email)">
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="savePersonalData()">Save Changes</button>
         </div>
     </div>
 
@@ -239,38 +239,41 @@
                 <option>Bachelor's Degree</option>
                 <option>Master's Degree</option>
             </select>
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('eduModal')">Save Education</button>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="saveEducationData()">Save Education</button>
         </div>
     </div>
 
     <div id="idModal" class="modal">
         <div class="modal-content">
             <h2>Verify Identity</h2>
-            <label class="upload-area" for="idFront"><i class="fa-solid fa-id-card"></i><br><span>ID Card (Front)</span><input type="file" id="idFront" accept="image/*"></label>
-            <label class="upload-area" for="selfie"><i class="fa-solid fa-camera-retro"></i><br><span>Live Selfie</span><input type="file" id="selfie" accept="image/*"></label>
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('idModal')">Submit Documents</button>
+            <label class="upload-area" for="idFront"><i class="fa-solid fa-id-card"></i><br><span>ID Card / Passport</span><input type="file" id="idFront" accept="image/*"></label>
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="saveIdentityData()">Submit Documents</button>
         </div>
     </div>
 
     <div id="bankModal" class="modal">
         <div class="modal-content">
             <h2>Payout Details</h2>
-            <select><option>Mobile Money</option><option>Bank Transfer</option></select>
-            <input type="text" placeholder="Account Number / Phone">
-            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('bankModal')">Save Details</button>
+            <select id="payoutMethod"><option>Mobile Money</option><option>Bank Transfer</option></select>
+            <input type="text" id="payoutAccount" placeholder="Account Number / Phone">
+            <button class="btn-update" style="width:100%; margin-top:15px;" onclick="savePayoutDetails()">Save Details</button>
         </div>
     </div>
 
     <div id="paymentModal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #2ecc71;"></i>
-            <h2>Subscribe to 1 year membership for $25</h2>
-            <button class="btn-update" id="payBtn" style="width:100%; padding: 15px;" onclick="processPaystack()">CONFIRM MEMBERSHIP APPLICATION</button>
+            <h2>Membership Subscription</h2>
+            <p>Enter the M-Pesa / Transaction Reference Code below:</p>
+            <input type="text" id="paymentRefCode" placeholder="Enter Transaction Code (e.g. QWX123...)">
+            <button class="btn-update" id="payBtn" style="width:100%; padding: 15px;" onclick="savePaymentRef()">CONFIRM APPLICATION</button>
             <button class="btn-update" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444;" onclick="closeModal('paymentModal')">Cancel</button>
         </div>
     </div>
 
     <script>
+        const baseUrl = 'https://cloudtasks-web.onrender.com';
+
         function showView(viewId, element) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
@@ -281,7 +284,83 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- RESTORED: COUNTRY DATA & PREFIX LOGIC ---
+        // --- BACKEND INTEGRATION FUNCTIONS ---
+
+        async function updateProfileRequest(data, isFile = false) {
+            const email = document.getElementById('uEmail').value || prompt("Please confirm your registered email address:");
+            if (!email) return alert("Email is required to save data.");
+            
+            let body;
+            let headers = {};
+
+            if (isFile) {
+                body = data; // Already a FormData object
+                body.append('email', email);
+            } else {
+                body = JSON.stringify({ ...data, email });
+                headers['Content-Type'] = 'application/json';
+            }
+
+            try {
+                const response = await fetch(`${baseUrl}/api/user/update-profile`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: body
+                });
+                if (response.ok) {
+                    alert("Information updated successfully!");
+                } else {
+                    alert("Failed to update. Make sure you used the correct email.");
+                }
+            } catch (err) {
+                alert("Server error. Please check your connection.");
+            }
+        }
+
+        function savePersonalData() {
+            const data = {
+                fullName: document.getElementById('fname').value + " " + document.getElementById('lname').value,
+                phoneNumber: document.getElementById('phonePrefix').value + document.getElementById('pNumber').value
+            };
+            updateProfileRequest(data);
+            closeModal('personalModal');
+        }
+
+        function saveEducationData() {
+            updateProfileRequest({ education: document.getElementById('eduLevel').value });
+            closeModal('eduModal');
+        }
+
+        function savePayoutDetails() {
+            updateProfileRequest({ 
+                paymentMethod: document.getElementById('payoutMethod').value,
+                payoutAccount: document.getElementById('payoutAccount').value 
+            });
+            closeModal('bankModal');
+        }
+
+        function savePaymentRef() {
+            updateProfileRequest({ paymentRef: document.getElementById('paymentRefCode').value });
+            closeModal('paymentModal');
+        }
+
+        async function saveIdentityData() {
+            const fileInput = document.getElementById('idFront');
+            if (!fileInput.files[0]) return alert("Please select a file.");
+            
+            const formData = new FormData();
+            formData.append('idPhoto', fileInput.files[0]);
+            
+            alert("Uploading ID... please wait.");
+            await updateProfileRequest(formData, true);
+            closeModal('idModal');
+        }
+
+        function handleLogout() {
+            window.location.href = "index.html";
+        }
+
+        // --- COUNTRY DATA & PREFIX LOGIC ---
         const countryData = [{n: "Kenya", c: "+254"}, {n: "Uganda", c: "+256"}, {n: "Tanzania", c: "+255"}, {n: "Nigeria", c: "+234"}, {n: "USA", c: "+1"}, {n: "UK", c: "+44"}];
         const select = document.getElementById('countrySelect');
         countryData.forEach(country => {
@@ -294,25 +373,7 @@
             document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
-        // --- RESTORED: PAYSTACK & SAVE DATA HOOKS ---
-        function processPaystack() {
-            alert('Redirecting to Paystack secure payment...');
-            // In a real scenario, you'd call your Paystack JS here
-        }
-
-        function saveDetails(ref) {
-            const info = { ref: ref, email: document.getElementById('uEmail').value };
-            fetch('save_data.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(info)
-            }).then(() => {
-                alert("Success! Reference: " + ref);
-                closeModal('paymentModal');
-            });
-        }
-
-        // --- ADDITION: TASK GENERATOR ---
+        // --- TASK GENERATOR ---
         function checkVerification() {
             alert("Verification Required: You need to be a verified member to start tasks.");
             openModal('paymentModal');
