@@ -5,19 +5,23 @@
     <title>Cloudtasks | Admin Portal</title>
     <style>
         body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
-        .container { max-width: 800px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
+        /* Widened container to 1000px to fit new columns */
+        .container { max-width: 1000px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
         h2 { border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0; }
         #login-section { display: flex; gap: 10px; margin-bottom: 20px; }
         input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 4px; flex: 1; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         th, td { padding: 12px; border-bottom: 1px solid #30363d; text-align: left; }
-        th { background: #161b22; }
+        th { background: #161b22; color: #7c4dff; }
         button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         .btn-login { background: #7c4dff; color: white; }
         .btn-accept { background: #238636; color: white; }
         .btn-accept:hover { background: #2ea043; }
-        .btn-reject { background: #da3633; color: white; margin-left: 10px; }
+        .btn-reject { background: #da3633; color: white; margin-left: 5px; }
         .btn-reject:hover { background: #f85149; }
+        .id-link { color: #00ffa3; text-decoration: none; font-weight: bold; }
+        .id-link:hover { text-decoration: underline; }
+        .pay-code { color: #ffca28; font-family: monospace; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -33,8 +37,11 @@
         <table id="adminTable" style="display:none;">
             <thead>
                 <tr>
+                    <th>Name / Phone</th>
                     <th>Email</th>
-                    <th>Membership</th>
+                    <th>Education</th>
+                    <th>ID Doc</th>
+                    <th>Payment Code</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -48,15 +55,15 @@
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
             
-            // Simple check to prevent empty clicks
             if(!user || !pass) return alert("Please enter credentials");
 
             try {
+                // Pointing to your live Render backend
                 const response = await fetch('/api/admin/users', {
-                    method: 'GET', // Changed to GET as per standard admin fetch
+                    method: 'GET',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'admin-user': user, // Optional: Passing as headers for security
+                        'admin-user': user, 
                         'admin-pass': pass
                     }
                 });
@@ -70,11 +77,20 @@
                     list.innerHTML = '';
                     
                     users.forEach(u => {
+                        // Logic to handle missing data gracefully
+                        const displayName = u.fullName || "Not Set";
+                        const displayPhone = u.phoneNumber || "";
+                        const idLink = u.idPhotoPath ? `<a href="${u.idPhotoPath}" target="_blank" class="id-link">View ID</a>` : "No ID";
+                        const payCode = u.paymentRef ? `<span class="pay-code">${u.paymentRef}</span>` : "---";
+
                         list.innerHTML += `
                             <tr>
+                                <td><strong>${displayName}</strong><br><small>${displayPhone}</small></td>
                                 <td>${u.email}</td>
-                                <td>${u.isVerified ? '✅ Paid' : '❌ Pending'}</td>
-                                <td>${u.status || 'Registered'}</td>
+                                <td>${u.education || 'N/A'}</td>
+                                <td>${idLink}</td>
+                                <td>${payCode}</td>
+                                <td>${u.status || 'Pending'}</td>
                                 <td>
                                     <button class="btn-accept" onclick="updateStatus('${u.email}', 'Accepted')">Verify</button>
                                     <button class="btn-reject" onclick="updateStatus('${u.email}', 'Rejected')">Remove</button>
@@ -99,7 +115,7 @@
 
             if (res.ok) {
                 alert("User " + status + " successfully!");
-                loadApplicants(); // Refresh list to show changes
+                loadApplicants(); 
             }
         }
     </script>
