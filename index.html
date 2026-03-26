@@ -40,19 +40,6 @@
         </div>
     </div>
 
-    <div class="auth-container" id="otpSection" style="display: none;">
-        <h2>Verify Your Email</h2>
-        <p>We've sent a 6-digit code to your email.</p>
-        
-        <input type="text" id="otpInput" placeholder="ENTER OTP CODE" maxlength="6">
-        
-        <button onclick="verifyOTP()">Verify & Finish</button>
-        
-        <div class="toggle-text" onclick="location.reload()">
-            <span>Back to Signup</span>
-        </div>
-    </div>
-
     <script>
         let isLoginMode = false;
 
@@ -70,7 +57,9 @@
 
             if (!email || !password) return alert("Please fill in all fields.");
 
-            const endpoint = isLoginMode ? '/api/login' : '/api/send-otp';
+            // FIX: Pointing to your live Render backend
+            const baseUrl = 'https://cloudtasks-web.onrender.com';
+            const endpoint = isLoginMode ? `${baseUrl}/api/login` : `${baseUrl}/api/register`;
 
             try {
                 const response = await fetch(endpoint, {
@@ -82,42 +71,14 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    if (isLoginMode) {
-                        alert("Login successful!");
-                        window.location.href = "dashboard.html"; 
-                    } else {
-                        alert("OTP sent! Check your email.");
-                        // Hide signup, show OTP box
-                        document.getElementById('authForm').style.display = 'none';
-                        document.getElementById('otpSection').style.display = 'block';
-                    }
+                    alert(isLoginMode ? "Login successful!" : "Registration successful!");
+                    window.location.href = "dashboard.html"; 
                 } else {
                     alert(data.message || "Something went wrong.");
                 }
             } catch (error) {
-                alert("Could not connect to the server.");
-            }
-        }
-
-        async function verifyOTP() {
-            const email = document.getElementById('emailInput').value;
-            const otp = document.getElementById('otpInput').value;
-
-            try {
-                const response = await fetch('/api/verify-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, otp })
-                });
-
-                if (response.ok) {
-                    alert("Registration successful!");
-                    window.location.href = "dashboard.html";
-                } else {
-                    alert("Invalid OTP. Please try again.");
-                }
-            } catch (error) {
-                alert("Error verifying OTP.");
+                console.error("Connection Error:", error);
+                alert("Could not connect to the server. Please wait 60 seconds for Render to wake up and try again.");
             }
         }
     </script>
