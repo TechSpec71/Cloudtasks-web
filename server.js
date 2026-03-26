@@ -1,3 +1,7 @@
+// FORCING GOOGLE DNS TO FIX ENOTFOUND ERROR
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -37,22 +41,26 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
 
-// Database Connection
-mongoose.connect(process.env.MONGODB_URI)
+// --- UPDATED DATABASE CONNECTION ---
+// Using modern options for the legacy connection string
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
-// --- UPDATED USER MODEL (Added Education & Detailed Payout Fields) ---
+// --- UPDATED USER MODEL ---
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullName: { type: String, default: "" },
   phoneNumber: { type: String, default: "" },
-  education: { type: String, default: "" },      // New
-  idPhotoPath: { type: String, default: "" },    // Cloudinary URL
-  paymentMethod: { type: String, default: "" },  // New (Bank/Mobile)
-  payoutAccount: { type: String, default: "" },  // New (Acc Number)
-  paymentRef: { type: String, default: "" },     // Transaction Code
+  education: { type: String, default: "" },      
+  idPhotoPath: { type: String, default: "" },    
+  paymentMethod: { type: String, default: "" },  
+  payoutAccount: { type: String, default: "" },  
+  paymentRef: { type: String, default: "" },     
   isVerified: { type: Boolean, default: false },
   status: { type: String, default: 'Pending' },
   createdAt: { type: Date, default: Date.now }
@@ -61,7 +69,7 @@ const User = mongoose.model('User', userSchema);
 
 // --- ROUTES ---
 
-// 1. Registration (Kept exactly as yours)
+// 1. Registration
 app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   try {
     const { email, password, fullName, phoneNumber, paymentAccount, paymentRef } = req.body;
@@ -85,12 +93,11 @@ app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   }
 });
 
-// --- NEW: UPDATE PROFILE ROUTE (Used by Dashboard Modals) ---
+// --- NEW: UPDATE PROFILE ROUTE ---
 app.post('/api/user/update-profile', upload.single('idPhoto'), async (req, res) => {
   try {
     const { email, fullName, phoneNumber, education, paymentMethod, payoutAccount, paymentRef } = req.body;
     
-    // Create an object containing only the fields sent in the request
     let updateData = {};
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
@@ -110,7 +117,7 @@ app.post('/api/user/update-profile', upload.single('idPhoto'), async (req, res) 
   }
 });
 
-// 2. Login (Kept exactly as yours)
+// 2. Login
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -126,7 +133,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Admin: Fetch Users (Kept exactly as yours)
+// 3. Admin: Fetch Users
 app.get('/api/admin/users', async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
@@ -136,7 +143,7 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// 4. Admin: Update Status (Kept exactly as yours)
+// 4. Admin: Update Status
 app.post('/api/admin/update-status', async (req, res) => {
   try {
     const { email, status } = req.body;
