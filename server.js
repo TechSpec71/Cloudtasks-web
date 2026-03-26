@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const cors = require('cors');
-const cloudinary = require('cloudinary').v2; // ADDED
-const { CloudinaryStorage } = require('multer-storage-cloudinary'); // ADDED
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -42,15 +42,17 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
-// User Model
+// --- UPDATED USER MODEL (Added Education & Detailed Payout Fields) ---
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  fullName: String,
-  phoneNumber: String,
-  idPhotoPath: String, // This will now store a URL from Cloudinary
-  paymentAccount: String,
-  paymentRef: String,
+  fullName: { type: String, default: "" },
+  phoneNumber: { type: String, default: "" },
+  education: { type: String, default: "" },      // New
+  idPhotoPath: { type: String, default: "" },    // Cloudinary URL
+  paymentMethod: { type: String, default: "" },  // New (Bank/Mobile)
+  payoutAccount: { type: String, default: "" },  // New (Acc Number)
+  paymentRef: { type: String, default: "" },     // Transaction Code
   isVerified: { type: Boolean, default: false },
   status: { type: String, default: 'Pending' },
   createdAt: { type: Date, default: Date.now }
@@ -59,26 +61,23 @@ const User = mongoose.model('User', userSchema);
 
 // --- ROUTES ---
 
-// 1. Registration (Updated for Cloudinary)
+// 1. Registration (Kept exactly as yours)
 app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   try {
     const { email, password, fullName, phoneNumber, paymentAccount, paymentRef } = req.body;
-    
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "Email already registered" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
     await User.create({ 
       email, 
       password: hashedPassword,
       fullName,
       phoneNumber,
-      paymentAccount,
+      payoutAccount: paymentAccount,
       paymentRef,
-      idPhotoPath: req.file ? req.file.path : null // req.file.path is the Cloudinary URL
+      idPhotoPath: req.file ? req.file.path : null
     });
-    
     res.status(201).json({ message: "Registration successful!" });
   } catch (error) {
     console.error(error);
@@ -86,12 +85,36 @@ app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   }
 });
 
-// 2. Login
+// --- NEW: UPDATE PROFILE ROUTE (Used by Dashboard Modals) ---
+app.post('/api/user/update-profile', upload.single('idPhoto'), async (req, res) => {
+  try {
+    const { email, fullName, phoneNumber, education, paymentMethod, payoutAccount, paymentRef } = req.body;
+    
+    // Create an object containing only the fields sent in the request
+    let updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (education !== undefined) updateData.education = education;
+    if (paymentMethod !== undefined) updateData.paymentMethod = paymentMethod;
+    if (payoutAccount !== undefined) updateData.payoutAccount = payoutAccount;
+    if (paymentRef !== undefined) updateData.paymentRef = paymentRef;
+    if (req.file) updateData.idPhotoPath = req.file.path;
+
+    const user = await User.findOneAndUpdate({ email }, updateData, { new: true });
+    
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+});
+
+// 2. Login (Kept exactly as yours)
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-
     if (user && await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '30d' });
       res.cookie('token', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
@@ -103,7 +126,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Admin: Fetch Users
+// 3. Admin: Fetch Users (Kept exactly as yours)
 app.get('/api/admin/users', async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
@@ -113,7 +136,7 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// 4. Admin: Update Status
+// 4. Admin: Update Status (Kept exactly as yours)
 app.post('/api/admin/update-status', async (req, res) => {
   try {
     const { email, status } = req.body;
