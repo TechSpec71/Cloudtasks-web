@@ -6,7 +6,7 @@
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; }
+        :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; overflow-x: hidden; }
         
         .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #333; }
@@ -20,8 +20,14 @@
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
-        .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 60px; border-radius: 20px; background: rgba(124, 77, 255, 0.05); margin-top: 50px; }
-        .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 40px; border-radius: 20px; background: rgba(124, 77, 255, 0.05); margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; transition: 0.3s; }
+        .btn-verify:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        /* Payment Detail Styling */
+        .payment-box { background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; text-align: left; border-left: 4px solid var(--success); margin-top: 20px; }
+        .payment-box p { margin: 8px 0; font-size: 0.95em; }
+        .copyable { color: var(--success); font-family: monospace; font-size: 1.2em; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -51,11 +57,29 @@
 
         <div id="restricted" class="view-section">
             <div class="lock-card">
-                <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
-                <h2 id="displayTitle">Section Restricted</h2>
-                <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
-                <p>Please verify your identity to unlock this feature.</p>
-                <button class="btn-verify" onclick="navTo('profile', document.getElementById('profileTrigger'))">Go to Verification</button>
+                <div id="lockMessage">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
+                    <h2 id="displayTitle">Section Restricted</h2>
+                    <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
+                    <p>Please verify your identity and subscribe to unlock this feature.</p>
+                    <button class="btn-verify" onclick="showPaybill()">Confirm Membership Application</button>
+                </div>
+
+                <div id="paybillView" style="display: none;">
+                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 50px; color: var(--success); margin-bottom: 15px;"></i>
+                    <h2 style="color: var(--success);">Payment Details</h2>
+                    <p>Use the M-Pesa details below to pay your $25 fee.</p>
+                    
+                    <div class="payment-box">
+                        <p><strong>Business NO:</strong> <span class="copyable">542542</span></p>
+                        <p><strong>Account NO:</strong> <span class="copyable">05508726426150</span></p>
+                    </div>
+
+                    <p style="font-size: 0.8em; color: #ffb800; margin-top: 15px;">
+                        *Once paid, your status will update within 30 minutes.
+                    </p>
+                    <button class="btn-verify" style="background: var(--success); color: #000;" onclick="navTo('profile', document.getElementById('profileTrigger'))">I Have Paid</button>
+                </div>
             </div>
         </div>
     </div>
@@ -64,6 +88,9 @@
         function wipeState() {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            // Reset the inner restricted view back to the lock message
+            document.getElementById('lockMessage').style.display = 'block';
+            document.getElementById('paybillView').style.display = 'none';
         }
 
         function navTo(id, el) {
@@ -87,11 +114,16 @@
             }
         }
 
+        // New function to swap restricted view to Paybill info
+        function showPaybill() {
+            document.getElementById('lockMessage').style.display = 'none';
+            document.getElementById('paybillView').style.display = 'block';
+        }
+
         function handleLogout() {
             console.log("Logging out...");
             localStorage.clear();
             sessionStorage.clear();
-            // Verify if your file is 'login.html' or 'index.html'
             window.location.href = 'login.html';
         }
     </script>
