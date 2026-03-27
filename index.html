@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-        window.location.replace('login.html');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Dashboard</title>
@@ -149,7 +145,7 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #e74c3c;" onclick="window.location.replace('login.html')">
+            <div class="nav-item" style="color: #e74c3c;">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
@@ -229,7 +225,6 @@
                 <input type="text" id="pNumber" placeholder="Phone Number">
             </div>
             <input type="email" id="uEmail" placeholder="Email Address">
-            <input type="text" id="refCode" placeholder="Referral Code (Optional)">
             <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('personalModal')">Save Changes</button>
         </div>
     </div>
@@ -260,12 +255,8 @@
     <div id="bankModal" class="modal">
         <div class="modal-content">
             <h2>Payout Details</h2>
-            <h5>NOTE:This is the account to which payments are to be made to you ,</h5>
-            
-            <h6>Please confirm you have entered the correct details before submitting. Below are the two available options for your region</h6>
-            <select><option>Bank Transfer </option><option>Mobile money</option></select>
+            <select><option>Mobile Money</option><option>Bank Transfer</option></select>
             <input type="text" placeholder="Account Number / Phone">
-            <input type="text" placeholder="Name of the Account holder/ Name under the mobile money holder">
             <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('bankModal')">Save Details</button>
         </div>
     </div>
@@ -303,6 +294,12 @@
             document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
+        // --- RESTORED: PAYSTACK & SAVE DATA HOOKS ---
+        function processPaystack() {
+            alert('Redirecting to Paystack secure payment...');
+            // In a real scenario, you'd call your Paystack JS here
+        }
+
         function saveDetails(ref) {
             const info = { ref: ref, email: document.getElementById('uEmail').value };
             fetch('save_data.php', {
@@ -325,4 +322,17 @@
         const tasks = ["AI Trainer", "Data Entry", "Social Media Moderator", "Japanese Translator", "Audio Transcription", "Virtual Assistant"];
         for(let i=0; i<15; i++) {
             const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
-            const randomPrice = Math.floor(Math.random() * 3
+            const randomPrice = Math.floor(Math.random() * 30) + 10;
+            grid.innerHTML += `
+                <div class="task-card">
+                    <span class="loc">Worldwide - Remote</span>
+                    <h3>${randomTask} Specialist</h3>
+                    <p class="price">$${randomPrice} per HR</p>
+                    <button class="btn-select" onclick="checkVerification()">Select Task</button>
+                </div>`;
+        }
+
+        window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
+    </script>
+</body>
+</html>
