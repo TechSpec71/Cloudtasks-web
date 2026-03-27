@@ -5,23 +5,25 @@
     <title>Cloudtasks | Admin Portal</title>
     <style>
         body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
-        /* Widened container to 1000px to fit new columns */
-        .container { max-width: 1000px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
+        /* Widened container and added overflow-x for the table */
+        .container { max-width: 1100px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 20px; border-radius: 8px; }
+        
         h2 { border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0; }
         #login-section { display: flex; gap: 10px; margin-bottom: 20px; }
         input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 4px; flex: 1; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 13px; }
         th, td { padding: 12px; border-bottom: 1px solid #30363d; text-align: left; }
-        th { background: #161b22; color: #7c4dff; }
+        th { background: #161b22; color: #7c4dff; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        
         button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         .btn-login { background: #7c4dff; color: white; }
         .btn-accept { background: #238636; color: white; }
-        .btn-accept:hover { background: #2ea043; }
         .btn-reject { background: #da3633; color: white; margin-left: 5px; }
-        .btn-reject:hover { background: #f85149; }
-        .id-link { color: #00ffa3; text-decoration: none; font-weight: bold; }
-        .id-link:hover { text-decoration: underline; }
-        .pay-code { color: #ffca28; font-family: monospace; font-size: 15px; }
+        
+        .id-link, .selfie-link { color: #00ffa3; text-decoration: none; font-weight: bold; }
+        .pay-code { color: #ffca28; font-family: monospace; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -34,22 +36,24 @@
             <button class="btn-login" onclick="loadApplicants()">Login</button>
         </div>
 
-        <table id="adminTable" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Name / Phone</th>
-                    <th>Email</th>
-                    <th>Refferal Code</th>
-                    <th>Education</th>
-                    <th>ID Doc</th>
-                    <th>Live Selfie</th>
-                    <th>Payment Code</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="applicantList"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="adminTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Name / Phone</th>
+                        <th>Email</th>
+                        <th>Referral Code</th>
+                        <th>Education</th>
+                        <th>ID Doc</th>
+                        <th>Live Selfie</th>
+                        <th>Payment Code</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="applicantList"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -60,7 +64,6 @@
             if(!user || !pass) return alert("Please enter credentials");
 
             try {
-                // Pointing to your live Render backend
                 const response = await fetch('/api/admin/users', {
                     method: 'GET',
                     headers: { 
@@ -79,18 +82,26 @@
                     list.innerHTML = '';
                     
                     users.forEach(u => {
-                        // Logic to handle missing data gracefully
+                        // Data formatting
                         const displayName = u.fullName || "Not Set";
                         const displayPhone = u.phoneNumber || "";
-                        const idLink = u.idPhotoPath ? `<a href="${u.idPhotoPath}" target="_blank" class="id-link">View ID</a>` : "No ID";
+                        const referral = u.referralCode || "N/A";
+                        
+                        // Link handling for ID and Selfie
+                        const idLink = u.idPhotoPath ? `<a href="${u.idPhotoPath}" target="_blank" class="id-link">View ID</a>` : "---";
+                        const selfieLink = u.selfiePath ? `<a href="${u.selfiePath}" target="_blank" class="selfie-link">View Selfie</a>` : "---";
+                        
                         const payCode = u.paymentRef ? `<span class="pay-code">${u.paymentRef}</span>` : "---";
 
+                        // UPDATED: Added rows for Referral Code and Live Selfie
                         list.innerHTML += `
                             <tr>
                                 <td><strong>${displayName}</strong><br><small>${displayPhone}</small></td>
                                 <td>${u.email}</td>
+                                <td>${referral}</td>
                                 <td>${u.education || 'N/A'}</td>
                                 <td>${idLink}</td>
+                                <td>${selfieLink}</td>
                                 <td>${payCode}</td>
                                 <td>${u.status || 'Pending'}</td>
                                 <td>
