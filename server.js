@@ -34,7 +34,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// UPDATED: Use .fields to allow multiple different file uploads
 const upload = multer({ storage: storage });
 const uploadFields = upload.fields([
   { name: 'idPhoto', maxCount: 1 },
@@ -47,21 +46,21 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
 
-// --- UPDATED DATABASE CONNECTION ---
+// --- DATABASE CONNECTION ---
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
-// --- UPDATED USER MODEL (Added Referral and Selfie) ---
+// --- USER MODEL ---
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullName: { type: String, default: "" },
   phoneNumber: { type: String, default: "" },
   education: { type: String, default: "" },      
-  referralCode: { type: String, default: "" },   // NEW FIELD
+  referralCode: { type: String, default: "" },
   idPhotoPath: { type: String, default: "" },    
-  selfiePath: { type: String, default: "" },      // NEW FIELD
+  selfiePath: { type: String, default: "" },      
   paymentMethod: { type: String, default: "" },  
   payoutAccount: { type: String, default: "" },  
   paymentRef: { type: String, default: "" },     
@@ -73,7 +72,7 @@ const User = mongoose.model('User', userSchema);
 
 // --- ROUTES ---
 
-// 1. Registration (Updated for Referral and Selfie)
+// 1. Registration
 app.post('/api/register', uploadFields, async (req, res) => {
   try {
     const { email, password, fullName, phoneNumber, education, referralCode, paymentAccount, paymentRef } = req.body;
@@ -82,7 +81,6 @@ app.post('/api/register', uploadFields, async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Check for uploaded files
     const idPath = req.files && req.files['idPhoto'] ? req.files['idPhoto'][0].path : null;
     const selfiePath = req.files && req.files['selfiePhoto'] ? req.files['selfiePhoto'][0].path : null;
 
@@ -105,7 +103,7 @@ app.post('/api/register', uploadFields, async (req, res) => {
   }
 });
 
-// --- UPDATE PROFILE ROUTE (Updated for Referral and Selfie) ---
+// 2. Profile Update
 app.post('/api/user/update-profile', uploadFields, async (req, res) => {
   try {
     const { email, fullName, phoneNumber, education, referralCode, paymentMethod, payoutAccount, paymentRef } = req.body;
@@ -119,7 +117,6 @@ app.post('/api/user/update-profile', uploadFields, async (req, res) => {
     if (payoutAccount !== undefined) updateData.payoutAccount = payoutAccount;
     if (paymentRef !== undefined) updateData.paymentRef = paymentRef;
 
-    // Update images if provided
     if (req.files && req.files['idPhoto']) updateData.idPhotoPath = req.files['idPhoto'][0].path;
     if (req.files && req.files['selfiePhoto']) updateData.selfiePath = req.files['selfiePhoto'][0].path;
 
@@ -133,14 +130,22 @@ app.post('/api/user/update-profile', uploadFields, async (req, res) => {
   }
 });
 
-// 2. Login
+// 3. Login (UPDATED: Session Cookie Logic)
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '30d' });
-      res.cookie('token', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+      // Create a token
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+      
+      // Set as a Session Cookie (No maxAge means it expires when the tab/browser closes)
+      res.cookie('token', token, { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Only over HTTPS in production
+        sameSite: 'strict'
+      });
+
       return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html' });
     }
     res.status(401).json({ message: "Invalid email or password" });
@@ -149,7 +154,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Admin: Fetch Users
+// 4. Admin Routes
 app.get('/api/admin/users', async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
@@ -159,7 +164,6 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// 4. Admin: Update Status
 app.post('/api/admin/update-status', async (req, res) => {
   try {
     const { email, status } = req.body;
@@ -170,8 +174,10 @@ app.post('/api/admin/update-status', async (req, res) => {
   }
 });
 
+// --- FORCED ENTRANCE ROUTE (UPDATED) ---
+// Now points to login.html as the primary page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 app.listen(PORT, () => console.log(`✓ Server live on port ${PORT}`));
