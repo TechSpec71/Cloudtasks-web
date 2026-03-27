@@ -6,15 +6,72 @@
     <title>CloudTasks - Secure Workspace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* FIX: Prevents overlapping by including padding in width calculations */
+        * { box-sizing: border-box; }
+
         :root { --primary: #7c4dff; --bg: #1a1a2e; --card: #16213e; --text: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 10px; /* Adds space for mobile edges */
+        }
+
         nav { width: 100%; padding: 20px; display: flex; justify-content: center; }
         .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        .auth-container { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; margin-top: 50px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 20px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+
+        .auth-container { 
+            background: var(--card); 
+            padding: 30px 20px; /* Adjusted for better mobile fit */
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            width: 95%; /* Responsive width */
+            max-width: 400px; 
+            text-align: center; 
+            margin-top: 30px; 
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid #30363d; 
+            background: #0d1117; 
+            color: white; 
+            font-size: 16px; /* Prevents iOS auto-zoom on focus */
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            margin-top: 20px; 
+            border-radius: 8px; 
+            border: none; 
+            background: var(--primary); 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 16px;
+        }
+
         button:hover { opacity: 0.9; transform: translateY(-2px); }
-        .toggle-text { margin-top: 20px; font-size: 14px; color: #8b949e; cursor: pointer; }
+        button:disabled { background: #555; cursor: not-allowed; }
+
+        .toggle-text { margin-top: 25px; font-size: 14px; color: #8b949e; cursor: pointer; text-decoration: underline; }
+
+        /* Tablet/Desktop optimization */
+        @media (min-width: 600px) {
+            body { padding: 0; }
+            .auth-container { padding: 40px; margin-top: 50px; }
+        }
     </style>
 </head>
 <body>
@@ -28,15 +85,15 @@
 
     <div class="auth-container" id="authForm">
         <h2 id="auth-title">Create Account</h2>
-        <p id="auth-desc">Join CloudTasks to manage your goals</p>
+        <p id="auth-desc" style="margin-bottom: 20px; color: #8b949e;">Join CloudTasks to manage your goals</p>
         
         <input type="email" id="emailInput" placeholder="EMAIL ADDRESS">
         <input type="password" id="passInput" placeholder="PASSWORD">
         
         <button id="submit-btn" onclick="handleAuth()">Get Started</button>
         
-        <div class="toggle-text">
-            <span id="toggle-link" onclick="toggleMode()">Already have an account? Click here</span>
+        <div class="toggle-text" onclick="toggleMode()">
+            <span id="toggle-link">Already have an account? Click here</span>
         </div>
     </div>
 
@@ -54,10 +111,14 @@
         async function handleAuth() {
             const email = document.getElementById('emailInput').value;
             const password = document.getElementById('passInput').value;
+            const btn = document.getElementById('submit-btn');
 
             if (!email || !password) return alert("Please fill in all fields.");
 
-            // FIX: Pointing to your live Render backend
+            // Visual feedback
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
             const baseUrl = 'https://cloudtasks-web.onrender.com';
             const endpoint = isLoginMode ? `${baseUrl}/api/login` : `${baseUrl}/api/register`;
 
@@ -71,14 +132,18 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(isLoginMode ? "Login successful!" : "Registration successful!");
+                    // Note: Browser will handle the cookie from server.js automatically
                     window.location.href = "dashboard.html"; 
                 } else {
                     alert(data.message || "Something went wrong.");
                 }
             } catch (error) {
                 console.error("Connection Error:", error);
-                alert("Could not connect to the server. Please wait 60 seconds for Render to wake up and try again.");
+                alert("Could not connect. Please wait for Render to wake up (approx 60s) and try again.");
+            } finally {
+                // Reset button state
+                btn.disabled = false;
+                btn.innerText = isLoginMode ? "Login" : "Get Started";
             }
         }
     </script>
