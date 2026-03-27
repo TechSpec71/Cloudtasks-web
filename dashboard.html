@@ -7,82 +7,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; }
-        * { box-sizing: border-box; } 
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; }
-
-        .sidebar {
-            width: var(--sidebar-w); background: #000; height: 100vh;
-            position: fixed; display: flex; flex-direction: column; padding: 20px;
-        }
-        .nav-item {
-            padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px;
-            display: flex; align-items: center; gap: 10px; border-radius: 8px;
-        }
-        .nav-item.active { background: var(--primary); color: white; }
-
-        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; }
         
-        /* This forces the sections to hide unless they have the 'active' class */
+        /* Sidebar Styles */
+        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; }
+        .nav-item { padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border-radius: 8px; }
+        .nav-item.active { background: var(--primary); color: white; }
+        .logout-btn { margin-top: auto; color: #ff4d4d !important; border-top: 1px solid #333; padding-top: 20px; }
+
+        /* Main Content Styles */
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; }
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
-        .lock-box {
-            text-align: center; border: 2px dashed var(--primary);
-            padding: 40px; border-radius: 20px; background: rgba(255,255,255,0.03);
-            margin-top: 50px;
-        }
+        .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 60px; border-radius: 20px; background: rgba(124, 77, 255, 0.05); margin-top: 50px; }
+        .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>CloudTasks</h2>
-        <div class="nav-item active" onclick="go('home')"> <i class="fa fa-home"></i> Home </div>
-        <div id="pBtn" class="nav-item" onclick="go('profile')"> <i class="fa fa-user"></i> Profile </div>
+        <h2 style="color: var(--primary); margin-bottom: 30px;">CloudTasks</h2>
+        <div class="nav-item active" onclick="navTo('home', this)"> <i class="fa fa-house"></i> Home Page </div>
+        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"> <i class="fa fa-user"></i> User Profile </div>
         
-        <div class="nav-item" onclick="goLock('Available Tasks')"> <i class="fa fa-list"></i> Tasks </div>
-        <div class="nav-item" onclick="goLock('My Projects')"> <i class="fa fa-tasks"></i> Projects </div>
-        <div class="nav-item" onclick="goLock('My Wallet')"> <i class="fa fa-wallet"></i> Wallet </div>
+        <div class="nav-item" onclick="navLock('Available Tasks', this)"> <i class="fa fa-list"></i> Available Tasks </div>
+        <div class="nav-item" onclick="navLock('My Projects', this)"> <i class="fa fa-spinner"></i> My Projects </div>
+        <div class="nav-item" onclick="navLock('My Wallet', this)"> <i class="fa fa-wallet"></i> My Wallet </div>
         
-        <div class="nav-item" style="margin-top:auto; color:#ff4d4d" onclick="out()"> <i class="fa fa-sign-out"></i> Logout </div>
+        <div class="nav-item logout-btn" onclick="handleLogout()"> <i class="fa fa-sign-out"></i> Logout </div>
     </div>
 
     <div class="main-content">
-        <div id="home" class="view-section active"> <h1>Welcome Home</h1> </div>
-        <div id="profile" class="view-section"> <h1>User Profile</h1> </div>
-        
+        <div id="home" class="view-section active">
+            <h1>Welcome to CloudTasks</h1>
+            <p>Your dashboard is active.</p>
+        </div>
+
+        <div id="profile" class="view-section">
+            <h1>User Profile</h1>
+            <p>Complete your details here.</p>
+        </div>
+
         <div id="restricted" class="view-section">
-            <div class="lock-box">
-                <i class="fa fa-lock" style="font-size: 50px; color: #ff4d4d"></i>
-                <h2 id="lockTitle">Restricted</h2>
-                <p>Membership Verification Required</p>
-                <button onclick="go('profile')" style="background:var(--primary); color:white; border:none; padding:10px 20px; cursor:pointer;">Verify Now</button>
+            <div class="lock-card">
+                <i class="fa fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
+                <h2 id="displayTitle">Section Restricted</h2>
+                <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
+                <p>Please verify your identity to unlock this feature.</p>
+                <button class="btn-verify" onclick="navTo('profile', document.getElementById('profileTrigger'))">Go to Verification</button>
             </div>
         </div>
     </div>
 
     <script>
-        function clear() {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        function wipeState() {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         }
 
-        function go(id) {
-            clear();
+        function navTo(id, el) {
+            wipeState();
             document.getElementById(id).classList.add('active');
-            // This highlights the button you clicked
-            event.currentTarget.classList.add('active');
+            el.classList.add('active');
         }
 
-        function goLock(name) {
-            clear();
+        function navLock(title, el) {
+            wipeState();
             document.getElementById('restricted').classList.add('active');
-            document.getElementById('lockTitle').innerText = name;
-            event.currentTarget.classList.add('active');
+            document.getElementById('displayTitle').innerText = title;
+            el.classList.add('active');
         }
 
-        function out() {
+        function handleLogout() {
             localStorage.clear();
+            sessionStorage.clear();
+            // Use replace so they can't go back
             window.location.replace('login.html');
         }
     </script>
