@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        window.location.replace('login.html');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Dashboard</title>
@@ -145,7 +149,7 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #e74c3c;">
+            <div class="nav-item" style="color: #e74c3c;" onclick="window.location.replace('login.html')">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
@@ -321,17 +325,4 @@
         const tasks = ["AI Trainer", "Data Entry", "Social Media Moderator", "Japanese Translator", "Audio Transcription", "Virtual Assistant"];
         for(let i=0; i<15; i++) {
             const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
-            const randomPrice = Math.floor(Math.random() * 30) + 10;
-            grid.innerHTML += `
-                <div class="task-card">
-                    <span class="loc">Worldwide - Remote</span>
-                    <h3>${randomTask} Specialist</h3>
-                    <p class="price">$${randomPrice} per HR</p>
-                    <button class="btn-select" onclick="checkVerification()">Select Task</button>
-                </div>`;
-        }
-
-        window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
-    </script>
-</body>
-</html>
+            const randomPrice = Math.floor(Math.random() * 3
