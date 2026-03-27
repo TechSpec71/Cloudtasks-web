@@ -7,16 +7,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; }
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; overflow-x: hidden; }
         
-        /* Sidebar Styles */
-        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; }
-        .nav-item { padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border-radius: 8px; }
-        .nav-item.active { background: var(--primary); color: white; }
+        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #333; }
+        .nav-item { padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border-radius: 8px; transition: 0.2s; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
+        .nav-item.active { background: var(--primary) !important; color: white !important; }
+        
         .logout-btn { margin-top: auto; color: #ff4d4d !important; border-top: 1px solid #333; padding-top: 20px; }
 
-        /* Main Content Styles */
-        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; }
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; min-height: 100vh; }
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
@@ -28,14 +28,14 @@
 
     <div class="sidebar">
         <h2 style="color: var(--primary); margin-bottom: 30px;">CloudTasks</h2>
-        <div class="nav-item active" onclick="navTo('home', this)"> <i class="fa fa-house"></i> Home Page </div>
-        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"> <i class="fa fa-user"></i> User Profile </div>
+        <div class="nav-item active" onclick="navTo('home', this)"> <i class="fa-solid fa-house"></i> Home Page </div>
+        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"> <i class="fa-solid fa-user"></i> User Profile </div>
         
-        <div class="nav-item" onclick="navLock('Available Tasks', this)"> <i class="fa fa-list"></i> Available Tasks </div>
-        <div class="nav-item" onclick="navLock('My Projects', this)"> <i class="fa fa-spinner"></i> My Projects </div>
-        <div class="nav-item" onclick="navLock('My Wallet', this)"> <i class="fa fa-wallet"></i> My Wallet </div>
+        <div class="nav-item" onclick="navLock('Available Tasks', this)"> <i class="fa-solid fa-list-check"></i> Available Tasks </div>
+        <div class="nav-item" onclick="navLock('My Projects', this)"> <i class="fa-solid fa-diagram-project"></i> My Projects </div>
+        <div class="nav-item" onclick="navLock('My Wallet', this)"> <i class="fa-solid fa-wallet"></i> My Wallet </div>
         
-        <div class="nav-item logout-btn" onclick="handleLogout()"> <i class="fa fa-sign-out"></i> Logout </div>
+        <div class="nav-item logout-btn" onclick="handleLogout()"> <i class="fa-solid fa-right-from-bracket"></i> Logout </div>
     </div>
 
     <div class="main-content">
@@ -46,12 +46,12 @@
 
         <div id="profile" class="view-section">
             <h1>User Profile</h1>
-            <p>Complete your details here.</p>
+            <p>Complete your details here to get verified.</p>
         </div>
 
         <div id="restricted" class="view-section">
             <div class="lock-card">
-                <i class="fa fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
+                <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
                 <h2 id="displayTitle">Section Restricted</h2>
                 <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
                 <p>Please verify your identity to unlock this feature.</p>
@@ -67,23 +67,32 @@
         }
 
         function navTo(id, el) {
+            console.log("Navigating to:", id);
             wipeState();
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
+            const target = document.getElementById(id);
+            if(target) {
+                target.classList.add('active');
+                el.classList.add('active');
+            }
         }
 
         function navLock(title, el) {
+            console.log("Locked section clicked:", title);
             wipeState();
-            document.getElementById('restricted').classList.add('active');
-            document.getElementById('displayTitle').innerText = title;
-            el.classList.add('active');
+            const restricted = document.getElementById('restricted');
+            if(restricted) {
+                restricted.classList.add('active');
+                document.getElementById('displayTitle').innerText = title;
+                el.classList.add('active');
+            }
         }
 
         function handleLogout() {
+            console.log("Logging out...");
             localStorage.clear();
             sessionStorage.clear();
-            // Use replace so they can't go back
-            window.location.replace('login.html');
+            // Verify if your file is 'login.html' or 'index.html'
+            window.location.href = 'login.html';
         }
     </script>
 </body>
