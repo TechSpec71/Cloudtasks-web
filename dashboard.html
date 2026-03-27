@@ -65,6 +65,13 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
+        /* --- VERIFICATION MESSAGE STYLE --- */
+        .verification-notice {
+            text-align: center; margin-top: 100px; padding: 40px;
+            background: rgba(255,255,255,0.05); border-radius: 20px;
+            border: 1px dashed var(--primary);
+        }
+
         /* --- TASK GRID STYLES --- */
         .task-grid {
             display: grid;
@@ -145,16 +152,16 @@
         <div class="nav-item" onclick="showView('profileView', this)">
             <i class="fa-solid fa-user-circle"></i> User Profile
         </div>
-        <div class="nav-item" onclick="showView('tasksView', this)">
+        <div class="nav-item" onclick="showRestrictedView('Available Tasks', this)">
             <i class="fa-solid fa-list-check"></i> Available Tasks
         </div>
-        <div class="nav-item" onclick="showView('projectsView', this)">
+        <div class="nav-item" onclick="showRestrictedView('My Projects', this)">
             <i class="fa-solid fa-spinner"></i> My Projects
         </div>
-        <div class="nav-item" onclick="showView('walletView', this)">
+        <div class="nav-item" onclick="showRestrictedView('My Wallet', this)">
             <i class="fa-solid fa-wallet"></i> My Wallet
         </div>
-        <div class="nav-item" onclick="showView('historyView', this)">
+        <div class="nav-item" onclick="showRestrictedView('History', this)">
             <i class="fa-solid fa-clock-rotate-left"></i> History
         </div>
         
@@ -162,7 +169,7 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #e74c3c;">
+            <div class="nav-item" style="color: #e74c3c;" onclick="logout()">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
@@ -174,6 +181,15 @@
             <p>Your dashboard overview will appear here.</p>
         </div>
 
+        <div id="restrictedView" class="view-section">
+            <div class="verification-notice">
+                <i class="fa-solid fa-lock" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+                <h2 id="restrictedTitle">Section Restricted</h2>
+                <p style="font-size: 18px; color: #b0b0b0;">Membership Verification Required</p>
+                <button class="btn-update" style="max-width: 200px; margin-top: 20px;" onclick="showView('profileView', document.querySelector('[onclick*=\'profileView\']'))">Complete Profile</button>
+            </div>
+        </div>
+
         <div id="profileView" class="view-section">
             <div class="container">
                 <div class="glass-card">
@@ -183,12 +199,12 @@
                     <p>Manage account settings and contact information.</p>
                     <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
                 </div>
-                </div>
+            </div>
         </div>
 
-        <div id="tasksView" class="view-section">
-            <h1>Available Tasks</h1>
-            <div class="task-grid" id="taskGrid"></div>
+        <div id="supportView" class="view-section">
+            <h1>Help & Support</h1>
+            <p>Contact our support team for assistance.</p>
         </div>
     </div>
 
@@ -203,7 +219,6 @@
     </div>
 
     <script>
-        // NEW: Toggle function for mobile sidebar
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('show');
         }
@@ -213,27 +228,27 @@
             document.getElementById(viewId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             element.classList.add('active');
-            // Close sidebar automatically on mobile after clicking a link
             if(window.innerWidth <= 992) toggleMenu();
+        }
+
+        // Specific function for Restricted Info
+        function showRestrictedView(title, element) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById('restrictedView').classList.add('active');
+            document.getElementById('restrictedTitle').innerText = title;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
+            if(window.innerWidth <= 992) toggleMenu();
+        }
+
+        function logout() {
+            // Clears local session and redirects to index
+            localStorage.clear();
+            window.location.href = 'index.html';
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // --- TASK GENERATOR (Exactly as you had it) ---
-        const grid = document.getElementById('taskGrid');
-        const tasks = ["AI Trainer", "Data Entry", "Social Media Moderator", "Japanese Translator", "Audio Transcription", "Virtual Assistant"];
-        for(let i=0; i<6; i++) {
-            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
-            const randomPrice = Math.floor(Math.random() * 30) + 10;
-            grid.innerHTML += `
-                <div class="task-card">
-                    <span class="loc">Worldwide - Remote</span>
-                    <h3>${randomTask} Specialist</h3>
-                    <p class="price">$${randomPrice} per HR</p>
-                    <button class="btn-select">Select Task</button>
-                </div>`;
-        }
 
         window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
     </script>
