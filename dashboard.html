@@ -24,7 +24,6 @@
         .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; transition: 0.3s; }
         .btn-verify:hover { opacity: 0.9; transform: translateY(-2px); }
         
-        /* Payment Detail Styling */
         .payment-box { background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; text-align: left; border-left: 4px solid var(--success); margin-top: 20px; }
         .payment-box p { margin: 8px 0; font-size: 0.95em; }
         .copyable { color: var(--success); font-family: monospace; font-size: 1.2em; letter-spacing: 1px; }
@@ -85,15 +84,8 @@
     </div>
 
     <script>
-        // --- THE GATEKEEPER ---
-        // Runs immediately to prevent unauthorized access
-        (function() {
-            const user = localStorage.getItem('user'); 
-            if (!user) {
-                // If no user data is found, redirect to login page immediately
-                window.location.replace('login.html');
-            }
-        })();
+        // STORAGE REMOVED: This page no longer checks for "logged in" status.
+        // It relies on your server to point the user to the right page.
 
         function wipeState() {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
@@ -103,7 +95,6 @@
         }
 
         function navTo(id, el) {
-            console.log("Navigating to:", id);
             wipeState();
             const target = document.getElementById(id);
             if(target) {
@@ -113,7 +104,6 @@
         }
 
         function navLock(title, el) {
-            console.log("Locked section clicked:", title);
             wipeState();
             const restricted = document.getElementById('restricted');
             if(restricted) {
@@ -129,9 +119,7 @@
         }
 
         function handleLogout() {
-            console.log("Logging out...");
-            localStorage.clear();
-            sessionStorage.clear();
+            // Just redirect—nothing to clear since we aren't saving anything!
             window.location.replace('login.html');
         }
     </script>
