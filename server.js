@@ -33,7 +33,13 @@ const storage = new CloudinaryStorage({
     allowed_formats: ['jpg', 'png', 'jpeg'],
   },
 });
+
+// UPDATED: Use .fields to allow multiple different file uploads
 const upload = multer({ storage: storage });
+const uploadFields = upload.fields([
+  { name: 'idPhoto', maxCount: 1 },
+  { name: 'selfiePhoto', maxCount: 1 }
+]);
 
 // Middleware
 app.use(cors());
@@ -41,19 +47,21 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
 
-// --- UPDATED DATABASE CONNECTION (Fixed for Modern Mongoose) ---
+// --- UPDATED DATABASE CONNECTION ---
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✕ MongoDB Error:', err));
 
-// --- UPDATED USER MODEL ---
+// --- UPDATED USER MODEL (Added Referral and Selfie) ---
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullName: { type: String, default: "" },
   phoneNumber: { type: String, default: "" },
   education: { type: String, default: "" },      
+  referralCode: { type: String, default: "" },   // NEW FIELD
   idPhotoPath: { type: String, default: "" },    
+  selfiePath: { type: String, default: "" },      // NEW FIELD
   paymentMethod: { type: String, default: "" },  
   payoutAccount: { type: String, default: "" },  
   paymentRef: { type: String, default: "" },     
@@ -65,22 +73,30 @@ const User = mongoose.model('User', userSchema);
 
 // --- ROUTES ---
 
-// 1. Registration
-app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
+// 1. Registration (Updated for Referral and Selfie)
+app.post('/api/register', uploadFields, async (req, res) => {
   try {
-    const { email, password, fullName, phoneNumber, paymentAccount, paymentRef } = req.body;
+    const { email, password, fullName, phoneNumber, education, referralCode, paymentAccount, paymentRef } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "Email already registered" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Check for uploaded files
+    const idPath = req.files && req.files['idPhoto'] ? req.files['idPhoto'][0].path : null;
+    const selfiePath = req.files && req.files['selfiePhoto'] ? req.files['selfiePhoto'][0].path : null;
+
     await User.create({ 
       email, 
       password: hashedPassword,
       fullName,
       phoneNumber,
+      education,
+      referralCode,
       payoutAccount: paymentAccount,
       paymentRef,
-      idPhotoPath: req.file ? req.file.path : null
+      idPhotoPath: idPath,
+      selfiePath: selfiePath
     });
     res.status(201).json({ message: "Registration successful!" });
   } catch (error) {
@@ -89,19 +105,23 @@ app.post('/api/register', upload.single('idPhoto'), async (req, res) => {
   }
 });
 
-// --- UPDATE PROFILE ROUTE ---
-app.post('/api/user/update-profile', upload.single('idPhoto'), async (req, res) => {
+// --- UPDATE PROFILE ROUTE (Updated for Referral and Selfie) ---
+app.post('/api/user/update-profile', uploadFields, async (req, res) => {
   try {
-    const { email, fullName, phoneNumber, education, paymentMethod, payoutAccount, paymentRef } = req.body;
+    const { email, fullName, phoneNumber, education, referralCode, paymentMethod, payoutAccount, paymentRef } = req.body;
     
     let updateData = {};
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
     if (education !== undefined) updateData.education = education;
+    if (referralCode !== undefined) updateData.referralCode = referralCode;
     if (paymentMethod !== undefined) updateData.paymentMethod = paymentMethod;
     if (payoutAccount !== undefined) updateData.payoutAccount = payoutAccount;
     if (paymentRef !== undefined) updateData.paymentRef = paymentRef;
-    if (req.file) updateData.idPhotoPath = req.file.path;
+
+    // Update images if provided
+    if (req.files && req.files['idPhoto']) updateData.idPhotoPath = req.files['idPhoto'][0].path;
+    if (req.files && req.files['selfiePhoto']) updateData.selfiePath = req.files['selfiePhoto'][0].path;
 
     const user = await User.findOneAndUpdate({ email }, updateData, { new: true });
     
