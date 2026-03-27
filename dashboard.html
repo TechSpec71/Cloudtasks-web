@@ -85,10 +85,19 @@
     </div>
 
     <script>
+        // --- THE GATEKEEPER ---
+        // Runs immediately to prevent unauthorized access
+        (function() {
+            const user = localStorage.getItem('user'); 
+            if (!user) {
+                // If no user data is found, redirect to login page immediately
+                window.location.replace('login.html');
+            }
+        })();
+
         function wipeState() {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            // Reset the inner restricted view back to the lock message
             document.getElementById('lockMessage').style.display = 'block';
             document.getElementById('paybillView').style.display = 'none';
         }
@@ -114,7 +123,6 @@
             }
         }
 
-        // New function to swap restricted view to Paybill info
         function showPaybill() {
             document.getElementById('lockMessage').style.display = 'none';
             document.getElementById('paybillView').style.display = 'block';
@@ -124,7 +132,7 @@
             console.log("Logging out...");
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = 'login.html';
+            window.location.replace('login.html');
         }
     </script>
 </body>
