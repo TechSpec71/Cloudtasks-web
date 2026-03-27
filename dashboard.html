@@ -6,147 +6,83 @@
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
+        :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; }
         * { box-sizing: border-box; } 
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #1a1a2e;
-            margin: 0; min-height: 100vh; color: white; display: flex;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; }
 
-        /* --- SIDEBAR --- */
         .sidebar {
-            width: var(--sidebar-w); background: #000;
-            display: flex; flex-direction: column; padding: 30px 20px;
-            height: 100vh; position: fixed; z-index: 300;
+            width: var(--sidebar-w); background: #000; height: 100vh;
+            position: fixed; display: flex; flex-direction: column; padding: 20px;
         }
-        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
-        .logo i { color: var(--primary); }
-        
         .nav-item {
-            display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 12px;
-            color: #b0b0b0; cursor: pointer; margin-bottom: 8px; transition: 0.3s;
+            padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px;
+            display: flex; align-items: center; gap: 10px; border-radius: 8px;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: var(--primary) !important; color: white !important; }
+        .nav-item.active { background: var(--primary); color: white; }
 
-        /* --- MAIN CONTENT --- */
         .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; }
         
-        /* The "Hidden" logic - Force hide anything not active */
+        /* This forces the sections to hide unless they have the 'active' class */
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
-        /* --- RESTRICTED UI --- */
-        .verification-notice {
-            text-align: center; margin-top: 50px; padding: 40px;
-            background: rgba(255,255,255,0.03); border-radius: 20px;
-            border: 2px dashed var(--primary); max-width: 550px; margin-left: auto; margin-right: auto;
+        .lock-box {
+            text-align: center; border: 2px dashed var(--primary);
+            padding: 40px; border-radius: 20px; background: rgba(255,255,255,0.03);
+            margin-top: 50px;
         }
-        .btn-profile { 
-            background: var(--primary); color: white; border: none; 
-            padding: 12px 30px; border-radius: 8px; cursor: pointer; 
-            font-weight: bold; margin-top: 20px; 
-        }
-
-        @media (max-width: 992px) { .sidebar { left: -100%; } .main-content { margin-left: 0; } }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="logo"><i class="fa-solid fa-cloud"></i> <span>CloudTasks</span></div>
+        <h2>CloudTasks</h2>
+        <div class="nav-item active" onclick="go('home')"> <i class="fa fa-home"></i> Home </div>
+        <div id="pBtn" class="nav-item" onclick="go('profile')"> <i class="fa fa-user"></i> Profile </div>
         
-        <div class="nav-item active" onclick="changeView('homeView', this)"> 
-            <i class="fa-solid fa-house"></i> Home Page 
-        </div>
+        <div class="nav-item" onclick="goLock('Available Tasks')"> <i class="fa fa-list"></i> Tasks </div>
+        <div class="nav-item" onclick="goLock('My Projects')"> <i class="fa fa-tasks"></i> Projects </div>
+        <div class="nav-item" onclick="goLock('My Wallet')"> <i class="fa fa-wallet"></i> Wallet </div>
         
-        <div id="profileBtn" class="nav-item" onclick="changeView('profileView', this)"> 
-            <i class="fa-solid fa-user-circle"></i> User Profile 
-        </div>
-        
-        <div class="nav-item" onclick="changeRestricted('Available Tasks', this)"> 
-            <i class="fa-solid fa-list-check"></i> Available Tasks 
-        </div>
-        <div class="nav-item" onclick="changeRestricted('My Projects', this)"> 
-            <i class="fa-solid fa-spinner"></i> My Projects 
-        </div>
-        <div class="nav-item" onclick="changeRestricted('My Wallet', this)"> 
-            <i class="fa-solid fa-wallet"></i> My Wallet 
-        </div>
-        <div class="nav-item" onclick="changeRestricted('History', this)"> 
-            <i class="fa-solid fa-clock-rotate-left"></i> History 
-        </div>
-        
-        <div style="margin-top: auto; padding: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <div class="nav-item" style="color: #ff4d4d; background: transparent;" onclick="forceLogout()"> 
-                <i class="fa-solid fa-right-from-bracket"></i> Logout 
-            </div>
-        </div>
+        <div class="nav-item" style="margin-top:auto; color:#ff4d4d" onclick="out()"> <i class="fa fa-sign-out"></i> Logout </div>
     </div>
 
     <div class="main-content">
-        <div id="homeView" class="view-section active">
-            <h1>Welcome to CloudTasks</h1>
-            <p>Select an option from the sidebar to begin.</p>
-        </div>
-
-        <div id="profileView" class="view-section">
-            <h1>User Profile</h1>
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
-                <p><strong>Account Status:</strong> <span style="color: #ffb800;">Pending Verification</span></p>
-                <p>Manage your settings and verify your identity here.</p>
-            </div>
-        </div>
-
-        <div id="restrictedView" class="view-section">
-            <div class="verification-notice">
-                <i class="fa-solid fa-shield-lock" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
-                <h2 id="sectionNameDisplay">Section Restricted</h2>
-                <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
-                <p>You must complete your verification process to access this feature.</p>
-                <button class="btn-profile" onclick="changeView('profileView', document.getElementById('profileBtn'))">
-                    Complete Verification
-                </button>
+        <div id="home" class="view-section active"> <h1>Welcome Home</h1> </div>
+        <div id="profile" class="view-section"> <h1>User Profile</h1> </div>
+        
+        <div id="restricted" class="view-section">
+            <div class="lock-box">
+                <i class="fa fa-lock" style="font-size: 50px; color: #ff4d4d"></i>
+                <h2 id="lockTitle">Restricted</h2>
+                <p>Membership Verification Required</p>
+                <button onclick="go('profile')" style="background:var(--primary); color:white; border:none; padding:10px 20px; cursor:pointer;">Verify Now</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Helper to reset UI
-        function resetUI() {
-            const sections = document.querySelectorAll('.view-section');
-            const navs = document.querySelectorAll('.nav-item');
-            
-            sections.forEach(s => s.classList.remove('active'));
-            navs.forEach(n => n.classList.remove('active'));
+        function clear() {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         }
 
-        // Switch to a normal view
-        function changeView(viewId, element) {
-            resetUI();
-            const target = document.getElementById(viewId);
-            if(target) target.classList.add('active');
-            if(element) element.classList.add('active');
+        function go(id) {
+            clear();
+            document.getElementById(id).classList.add('active');
+            // This highlights the button you clicked
+            event.currentTarget.classList.add('active');
         }
 
-        // Switch to the restricted message
-        function changeRestricted(title, element) {
-            resetUI();
-            const restrictedContainer = document.getElementById('restrictedView');
-            const titleDisplay = document.getElementById('sectionNameDisplay');
-            
-            if(restrictedContainer) restrictedContainer.classList.add('active');
-            if(titleDisplay) titleDisplay.innerText = title;
-            if(element) element.classList.add('active');
+        function goLock(name) {
+            clear();
+            document.getElementById('restricted').classList.add('active');
+            document.getElementById('lockTitle').innerText = name;
+            event.currentTarget.classList.add('active');
         }
 
-        // FORCE LOGOUT
-        function forceLogout() {
-            console.log("Logging out...");
+        function out() {
             localStorage.clear();
-            sessionStorage.clear();
-            // Using replace so they can't click 'Back' to return to the dash
             window.location.replace('login.html');
         }
     </script>
