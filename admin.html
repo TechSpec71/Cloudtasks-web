@@ -5,14 +5,14 @@
     <title>Cloudtasks | Admin Portal</title>
     <style>
         body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
-        /* Widened container and added overflow-x for the table */
         .container { max-width: 1100px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 20px; border-radius: 8px; }
         
-        h2 { border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0; }
+        h2 { border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
         #login-section { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 4px; flex: 1; }
+        #admin-controls { display: none; margin-bottom: 20px; justify-content: space-between; align-items: center; }
         
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 4px; flex: 1; }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 13px; }
         th, td { padding: 12px; border-bottom: 1px solid #30363d; text-align: left; }
         th { background: #161b22; color: #7c4dff; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
@@ -21,19 +21,29 @@
         .btn-login { background: #7c4dff; color: white; }
         .btn-accept { background: #238636; color: white; }
         .btn-reject { background: #da3633; color: white; margin-left: 5px; }
+        .btn-refresh { background: #00ffa3; color: #0a0e14; }
         
         .id-link, .selfie-link { color: #00ffa3; text-decoration: none; font-weight: bold; }
         .pay-code { color: #ffca28; font-family: monospace; font-size: 14px; }
+        #last-updated { font-size: 12px; color: #8b949e; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Cloudtasks Applicant Manager</h2>
+        <h2>
+            Cloudtasks Applicant Manager
+            <span id="last-updated"></span>
+        </h2>
         
         <div id="login-section">
             <input type="text" id="adminUser" placeholder="Admin Username">
             <input type="password" id="adminPass" placeholder="Admin Password">
             <button class="btn-login" onclick="loadApplicants()">Login</button>
+        </div>
+
+        <div id="admin-controls">
+            <button class="btn-refresh" onclick="loadApplicants()">Refresh Now</button>
+            <button class="btn-reject" style="background: #444;" onclick="logout()">Logout</button>
         </div>
 
         <div class="table-responsive">
@@ -56,12 +66,22 @@
         </div>
     </div>
 
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
     <script>
-        async function loadApplicants() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
+        let lastCount = 0;
+
+        async function loadApplicants(isAuto = false) {
+            // Check inputs first, then check localStorage memory
+            let user = document.getElementById('adminUser').value;
+            let pass = document.getElementById('adminPass').value;
+
+            if (!user || !pass) {
+                user = localStorage.getItem('adminUser');
+                pass = localStorage.getItem('adminPass');
+            }
             
-            if(!user || !pass) return alert("Please enter credentials");
+            if(!user || !pass) return;
 
             try {
                 const response = await fetch('/api/admin/users', {
@@ -75,25 +95,34 @@
 
                 if (response.ok) {
                     const users = await response.json();
+                    
+                    // Sound notification if new applicant is detected
+                    if (isAuto && users.length > lastCount && lastCount !== 0) {
+                        document.getElementById('notifSound').play();
+                    }
+                    lastCount = users.length;
+
+                    // Remember credentials
+                    localStorage.setItem('adminUser', user);
+                    localStorage.setItem('adminPass', pass);
+
+                    // Update UI
                     document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('admin-controls').style.display = 'flex';
                     document.getElementById('adminTable').style.display = 'table';
+                    document.getElementById('last-updated').innerText = "Last Updated: " + new Date().toLocaleTimeString();
                     
                     const list = document.getElementById('applicantList');
                     list.innerHTML = '';
                     
                     users.forEach(u => {
-                        // Data formatting
                         const displayName = u.fullName || "Not Set";
                         const displayPhone = u.phoneNumber || "";
                         const referral = u.referralCode || "N/A";
-                        
-                        // Link handling for ID and Selfie
                         const idLink = u.idPhotoPath ? `<a href="${u.idPhotoPath}" target="_blank" class="id-link">View ID</a>` : "---";
                         const selfieLink = u.selfiePath ? `<a href="${u.selfiePath}" target="_blank" class="selfie-link">View Selfie</a>` : "---";
-                        
                         const payCode = u.paymentRef ? `<span class="pay-code">${u.paymentRef}</span>` : "---";
 
-                        // UPDATED: Added rows for Referral Code and Live Selfie
                         list.innerHTML += `
                             <tr>
                                 <td><strong>${displayName}</strong><br><small>${displayPhone}</small></td>
@@ -110,12 +139,12 @@
                                 </td>
                             </tr>`;
                     });
-                } else {
+                } else if (!isAuto) {
                     alert("Unauthorized Access!");
                 }
             } catch (err) {
                 console.error(err);
-                alert("Server error connecting to database.");
+                if(!isAuto) alert("Server error connecting to database.");
             }
         }
 
@@ -128,9 +157,24 @@
 
             if (res.ok) {
                 alert("User " + status + " successfully!");
-                loadApplicants(); 
+                loadApplicants(true); 
             }
         }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        // AUTO-REFRESH: Runs every 30 seconds
+        setInterval(() => loadApplicants(true), 30000);
+
+        // AUTO-LOGIN: Runs on page load if memory exists
+        window.onload = () => {
+            if (localStorage.getItem('adminUser')) {
+                loadApplicants(true);
+            }
+        };
     </script>
 </body>
 </html>
