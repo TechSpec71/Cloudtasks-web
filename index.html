@@ -256,7 +256,9 @@
     <div id="bankModal" class="modal">
         <div class="modal-content">
             <h2>Payout Details</h2>
-            <h6>NOTE:This is the account to which payments are to be made to you ,</h6>
+            <h5>NOTE:This is the account to which payments are to be made to you ,</h5>
+            
+            <h6>Please confirm you have entered the correct details before submitting</h6>
             <select><option>Mobile Money</option><option>Bank Transfer</option></select>
             <input type="text" placeholder="Account Number / Phone">
             <button class="btn-update" style="width:100%; margin-top:15px;" onclick="closeModal('bankModal')">Save Details</button>
@@ -294,12 +296,6 @@
         function updatePrefix() {
             const country = countryData.find(c => c.n === select.value);
             document.getElementById('phonePrefix').value = country ? country.c : '';
-        }
-
-        // --- RESTORED: PAYSTACK & SAVE DATA HOOKS ---
-        function processPaystack() {
-            alert('Redirecting to Paystack secure payment...');
-            // In a real scenario, you'd call your Paystack JS here
         }
 
         function saveDetails(ref) {
