@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
         
@@ -69,26 +68,9 @@
         .verification-notice {
             text-align: center; margin-top: 100px; padding: 40px;
             background: rgba(255,255,255,0.05); border-radius: 20px;
-            border: 1px dashed var(--primary);
+            border: 2px dashed var(--primary);
+            max-width: 600px; margin-left: auto; margin-right: auto;
         }
-
-        /* --- TASK GRID STYLES --- */
-        .task-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px; margin-top: 20px;
-        }
-
-        .task-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px; padding: 25px;
-            transition: 0.3s ease; position: relative;
-        }
-        
-        .task-card .loc { font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .task-card h3 { font-size: 16px; margin: 10px 0; height: 40px; overflow: hidden; }
-        .task-card .price { font-size: 20px; color: var(--success); font-weight: bold; margin-bottom: 15px; }
 
         /* --- PROFILE CARD STYLES --- */
         .container { 
@@ -100,25 +82,19 @@
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 30px;
-            position: relative; transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-        .number-tag {
-            position: absolute; top: -10px; left: -10px; background: var(--primary);
-            width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-weight: bold; font-size: 16px;
+            position: relative; transition: 0.3s ease;
         }
 
-        .btn-update, .btn-select {
+        .btn-update {
             background: var(--primary); color: white; border: none; padding: 12px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%;
+            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
         }
 
         /* --- MODAL STYLES --- */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
         .modal-content { background: #16213e; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; }
 
-        /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 992px) {
             .sidebar { left: -100%; } 
             .sidebar.show { left: 0; }
@@ -126,7 +102,6 @@
             .main-content { margin-left: 0; padding: 100px 20px 40px; }
             .mobile-header { display: flex; }
             .container { grid-template-columns: 1fr; } 
-            .task-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -136,14 +111,13 @@
         <div class="logo" style="margin-bottom:0; font-size: 20px;">
             <i class="fa-solid fa-cloud"></i> <span>CloudTasks</span>
         </div>
-        <i class="fa-solid fa-bars" style="font-size: 24px; cursor:pointer;" onclick="toggleMenu()"></i>
+        <i class="fa-solid fa-bars" onclick="toggleMenu()"></i>
     </div>
 
     <div class="sidebar" id="sidebar">
         <i class="fa-solid fa-xmark close-menu" onclick="toggleMenu()"></i>
         <div class="logo">
-            <i class="fa-solid fa-cloud"></i>
-            <span>CloudTasks</span>
+            <i class="fa-solid fa-cloud"></i> <span>CloudTasks</span>
         </div>
 
         <div class="nav-item active" onclick="showView('homeView', this)">
@@ -169,7 +143,7 @@
             <div class="nav-item" onclick="showView('supportView', this)">
                 <i class="fa-solid fa-circle-question"></i> Help & Support
             </div>
-            <div class="nav-item" style="color: #e74c3c;" onclick="logout()">
+            <div class="nav-item" style="color: #e74c3c;" onclick="handleLogout()">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </div>
@@ -183,18 +157,17 @@
 
         <div id="restrictedView" class="view-section">
             <div class="verification-notice">
-                <i class="fa-solid fa-lock" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+                <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
                 <h2 id="restrictedTitle">Section Restricted</h2>
-                <p style="font-size: 18px; color: #b0b0b0;">Membership Verification Required</p>
-                <button class="btn-update" style="max-width: 200px; margin-top: 20px;" onclick="showView('profileView', document.querySelector('[onclick*=\'profileView\']'))">Complete Profile</button>
+                <h3 style="color: #ff4d4d;">Membership Verification Required</h3>
+                <p style="color: #b0b0b0;">Please complete your profile and verify your account to access this feature.</p>
+                <button class="btn-update" style="width: auto; padding: 12px 40px; margin-top: 15px;" onclick="showView('profileView', document.querySelector('.fa-user-circle').parentElement)">Go to Profile</button>
             </div>
         </div>
 
         <div id="profileView" class="view-section">
             <div class="container">
                 <div class="glass-card">
-                    <div class="number-tag">01</div>
-                    <div class="icon"><i class="fa-solid fa-user-gear" style="font-size: 24px; color: var(--primary);"></i></div>
                     <h3>Personal Profile</h3>
                     <p>Manage account settings and contact information.</p>
                     <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
@@ -204,15 +177,14 @@
 
         <div id="supportView" class="view-section">
             <h1>Help & Support</h1>
-            <p>Contact our support team for assistance.</p>
+            <p>Contact us if you have any issues.</p>
         </div>
     </div>
 
     <div id="personalModal" class="modal">
         <div class="modal-content">
             <h2>Personal Info</h2>
-            <input type="text" placeholder="First Name">
-            <input type="text" placeholder="Last Name">
+            <input type="text" placeholder="Full Name">
             <input type="email" placeholder="Email Address">
             <button class="btn-update" onclick="closeModal('personalModal')">Save Changes</button>
         </div>
@@ -223,34 +195,45 @@
             document.getElementById('sidebar').classList.toggle('show');
         }
 
+        // Standard View Switcher
         function showView(viewId, element) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            element.classList.add('active');
-            if(window.innerWidth <= 992) toggleMenu();
+            
+            document.getElementById(viewId).classList.add('active');
+            if(element) element.classList.add('active');
+            
+            if(window.innerWidth <= 992) document.getElementById('sidebar').classList.remove('show');
         }
 
-        // Specific function for Restricted Info
+        // Restricted View Switcher
         function showRestrictedView(title, element) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById('restrictedView').classList.add('active');
-            document.getElementById('restrictedTitle').innerText = title;
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            element.classList.add('active');
-            if(window.innerWidth <= 992) toggleMenu();
+            
+            const rView = document.getElementById('restrictedView');
+            rView.classList.add('active');
+            document.getElementById('restrictedTitle').innerText = title;
+            if(element) element.classList.add('active');
+            
+            if(window.innerWidth <= 992) document.getElementById('sidebar').classList.remove('show');
         }
 
-        function logout() {
-            // Clears local session and redirects to index
+        // Logout Logic
+        function handleLogout() {
+            console.log("Logging out...");
             localStorage.clear();
-            window.location.href = 'index.html';
+            sessionStorage.clear();
+            // This assumes index.html is in the same folder
+            window.location.replace('index.html');
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        window.onclick = function(event) { if (event.target.className === 'modal') event.target.style.display = 'none'; }
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') event.target.style.display = 'none';
+        }
     </script>
 </body>
 </html>
