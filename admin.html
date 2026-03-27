@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Cloudtasks | Admin Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: sans-serif; background: #0a0e14; color: white; padding: 40px; }
         .container { max-width: 1100px; margin: auto; background: #151b23; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
@@ -72,7 +73,6 @@
         let lastCount = 0;
 
         async function loadApplicants(isAuto = false) {
-            // Check inputs first, then check localStorage memory
             let user = document.getElementById('adminUser').value;
             let pass = document.getElementById('adminPass').value;
 
@@ -96,17 +96,14 @@
                 if (response.ok) {
                     const users = await response.json();
                     
-                    // Sound notification if new applicant is detected
                     if (isAuto && users.length > lastCount && lastCount !== 0) {
                         document.getElementById('notifSound').play();
                     }
                     lastCount = users.length;
 
-                    // Remember credentials
                     localStorage.setItem('adminUser', user);
                     localStorage.setItem('adminPass', pass);
 
-                    // Update UI
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('admin-controls').style.display = 'flex';
                     document.getElementById('adminTable').style.display = 'table';
@@ -166,10 +163,8 @@
             location.reload();
         }
 
-        // AUTO-REFRESH: Runs every 30 seconds
         setInterval(() => loadApplicants(true), 30000);
 
-        // AUTO-LOGIN: Runs on page load if memory exists
         window.onload = () => {
             if (localStorage.getItem('adminUser')) {
                 loadApplicants(true);
