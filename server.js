@@ -118,7 +118,14 @@ app.post('/api/user/update-profile', uploadFields, async (req, res) => {
     if (referralCode !== undefined) updateData.referralCode = referralCode;
     if (paymentMethod !== undefined) updateData.paymentMethod = paymentMethod;
     if (payoutAccount !== undefined) updateData.payoutAccount = payoutAccount;
-    if (paymentRef !== undefined) updateData.paymentRef = paymentRef;
+    if (paymentRef !== undefined) {
+      // Ensure no other user has already submitted this same reference code
+      const refTaken = await User.findOne({ paymentRef, email: { $ne: email } });
+      if (refTaken) {
+        return res.status(409).json({ message: "This reference code has already been used. Please enter a valid unique code." });
+      }
+      updateData.paymentRef = paymentRef;
+    }
 
     if (req.files && req.files['idPhoto']) updateData.idPhotoPath = req.files['idPhoto'][0].path;
     if (req.files && req.files['selfiePhoto']) updateData.selfiePath = req.files['selfiePhoto'][0].path;

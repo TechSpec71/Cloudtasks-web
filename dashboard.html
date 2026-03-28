@@ -442,13 +442,32 @@
         <!-- RESTRICTED -->
         <div id="restricted" class="view-section">
             <div class="lock-card">
-                <div id="lockMessage">
+
+                <!-- Pending / Default -->
+                <div id="restrictPending">
                     <i class="fa-solid fa-shield-halved" style="font-size:60px;color:#ff4d4d;margin-bottom:20px;"></i>
                     <h2 id="displayTitle">Section Restricted</h2>
                     <h3 style="color:#b0b0b0;">Membership Verification Required</h3>
                     <p>Please verify your identity and subscribe to unlock this feature.</p>
                     <button class="btn-verify" onclick="navTo('profile', document.getElementById('profileTrigger'))">Go to Profile</button>
                 </div>
+
+                <!-- Accepted -->
+                <div id="restrictAccepted" style="display:none;">
+                    <i class="fa-solid fa-circle-check" style="font-size:60px;color:var(--success);margin-bottom:20px;"></i>
+                    <h2 id="displayTitleAccepted">Section Locked</h2>
+                    <h3 style="color:var(--success);">Membership Application Successful</h3>
+                    <p style="color:#b0b0b0;">Onboarding assessment will be mailed to you by Our CloudTask Team.</p>
+                </div>
+
+                <!-- Rejected -->
+                <div id="restrictRejected" style="display:none;">
+                    <i class="fa-solid fa-circle-xmark" style="font-size:60px;color:#ff6b6b;margin-bottom:20px;"></i>
+                    <h2 id="displayTitleRejected">Section Restricted</h2>
+                    <h3 style="color:#ff6b6b;">Sorry, Application Rejected</h3>
+                    <p style="color:#b0b0b0;">Please contact support or re-apply with the correct details.</p>
+                </div>
+
             </div>
         </div>
 
@@ -544,7 +563,12 @@
                 <button class="modal-back" onclick="closeModal('memberModal')"><i class="fa-solid fa-arrow-left"></i></button>
                 <h2>Task / Member Access</h2>
                 <p style="color:#b0b0b0;font-size:0.9rem;margin-bottom:16px;">If you have an existing Membership ID, enter it below to check your access.</p>
-                <input type="text" id="memberIdInput" placeholder="Enter Membership ID" oninput="checkMemberId()">
+                <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                    <input type="text" id="memberIdInput" placeholder="Enter Membership ID" oninput="checkMemberId()" style="flex:1;margin:0;">
+                    <button onclick="checkMemberId()" style="background:var(--primary);border:none;color:white;width:46px;height:46px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
                 <div class="member-id-msg" id="memberIdMsg"></div>
                 <div style="margin-top:24px;border-top:1px solid #333;padding-top:20px;">
                     <p style="color:#b0b0b0;font-size:0.88rem;margin-top:0;">Don't have a Membership ID yet? Apply below to gain full access to tasks and projects.</p>
@@ -560,7 +584,7 @@
                 <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:14px;">Select a payment method to complete your CloudTasks membership.</p>
 
                 <div class="other-pay-grid">
-                    <button class="pay-btn-other" onclick="goToMobileMoney()" style="border-color:var(--success);color:var(--success);">
+                    <button class="pay-btn-other" onclick="goToMobileMoney()">
                         <i class="fa-solid fa-mobile-screen-button"></i> Mobile Money
                     </button>
                     <button class="pay-btn-other" onclick="showNotActive(event)"><i class="fa-brands fa-paypal"></i> PayPal</button>
@@ -778,7 +802,7 @@
             if (!val) { msg.style.display = 'none'; return; }
             if (val === 'HSC678') {
                 msg.className = 'member-id-msg overload';
-                msg.textContent = 'Sorry! This user ID is currently on overload.';
+                msg.textContent = 'Sorry! This ID has an overload at the moment.';
             } else {
                 msg.className = 'member-id-msg invalid';
                 msg.textContent = 'Invalid ID';
@@ -912,8 +936,24 @@
         function navLock(title, el) {
             wipeState();
             document.getElementById('restricted').classList.add('active');
-            document.getElementById('displayTitle').innerText = title;
             el.classList.add('active');
+
+            const status = currentUser ? (currentUser.status || 'Pending') : 'Pending';
+
+            document.getElementById('restrictPending').style.display = 'none';
+            document.getElementById('restrictAccepted').style.display = 'none';
+            document.getElementById('restrictRejected').style.display = 'none';
+
+            if (status === 'Accepted') {
+                document.getElementById('displayTitleAccepted').innerText = title;
+                document.getElementById('restrictAccepted').style.display = 'block';
+            } else if (status === 'Rejected') {
+                document.getElementById('displayTitleRejected').innerText = title;
+                document.getElementById('restrictRejected').style.display = 'block';
+            } else {
+                document.getElementById('displayTitle').innerText = title;
+                document.getElementById('restrictPending').style.display = 'block';
+            }
         }
 
         async function handleLogout() {
