@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudTasks - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>#replit-badge,[data-replit-badge],.replit-badge{display:none!important;}</style>
+    <script>new MutationObserver(()=>{const b=document.getElementById('replit-badge')||document.querySelector('[data-replit-badge]');if(b)b.remove();}).observe(document.documentElement,{childList:true,subtree:true});</script>
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
 
@@ -378,10 +380,6 @@
                 <video id="vid2" muted playsinline loop>
                     <source src="/attached_assets/generated_videos/hispanic-woman-remote-work.mp4" type="video/mp4">
                 </video>
-                <div class="vid-overlay">
-                    <i class="fa-solid fa-circle-play"></i>
-                    <span id="vidLabel">Remote Work</span>
-                </div>
                 <div class="vid-dots">
                     <div class="vid-dot active" onclick="switchVideo(0)"></div>
                     <div class="vid-dot" onclick="switchVideo(1)"></div>
@@ -798,13 +796,19 @@
         function checkMemberId() {
             const val = document.getElementById('memberIdInput').value.trim().toUpperCase();
             const msg = document.getElementById('memberIdMsg');
+            msg.style.display = '';
             msg.className = 'member-id-msg';
-            if (!val) { msg.style.display = 'none'; return; }
+            if (!val) {
+                msg.style.display = 'none';
+                return;
+            }
             if (val === 'HSC678') {
                 msg.className = 'member-id-msg overload';
+                msg.style.display = 'block';
                 msg.textContent = 'Sorry! This ID has an overload at the moment.';
             } else {
                 msg.className = 'member-id-msg invalid';
+                msg.style.display = 'block';
                 msg.textContent = 'Invalid ID';
             }
         }
@@ -829,7 +833,6 @@
         /* --- Video Shuffle --- */
         let currentVid = 0;
         const vidIds = ['vid0', 'vid1', 'vid2'];
-        const vidLabels = ['Remote Work', 'Remote Work', 'Remote Work'];
 
         function switchVideo(index) {
             const prev = document.getElementById(vidIds[currentVid]);
@@ -841,8 +844,6 @@
                 next.classList.add('active-video');
                 next.play().catch(() => {});
             }
-            const lbl = document.getElementById('vidLabel');
-            if (lbl) lbl.textContent = vidLabels[currentVid];
         }
 
         function startVideoLoop() {
