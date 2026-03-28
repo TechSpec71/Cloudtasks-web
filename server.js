@@ -142,8 +142,8 @@ app.post('/api/login', async (req, res) => {
       // Set as a Session Cookie (No maxAge means it expires when the tab/browser closes)
       res.cookie('token', token, { 
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Only over HTTPS in production
-        sameSite: 'strict'
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
       });
 
       return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html' });

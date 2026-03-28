@@ -236,6 +236,39 @@
         }
         .btn-submit-ref:hover { opacity: 0.88; }
 
+        /* --- HOME / VIDEO SECTION --- */
+        .home-header { margin-bottom: 32px; }
+        .home-header h1 { margin-bottom: 8px; }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(124,77,255,0.15);
+            color: var(--primary);
+            font-size: 11px; font-weight: bold;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px; margin-top: 8px;
+        }
+
+        .video-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px; overflow: hidden;
+            transition: 0.3s ease;
+        }
+        .video-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .video-card video { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .video-label {
+            padding: 14px 16px; font-size: 13px;
+            color: #b0b0b0; display: flex; align-items: center; gap: 8px;
+        }
+        .video-label i { color: var(--primary); }
+
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hamburger { display: flex; }
@@ -274,6 +307,8 @@
             }
 
             .lock-card { padding: 24px 16px; }
+
+            .video-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -308,8 +343,32 @@
 
         <!-- HOME -->
         <div id="home" class="view-section active">
-            <h1>Welcome to CloudTasks</h1>
-            <p style="color:#888;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
+            <div class="home-header">
+                <div class="section-tag">CloudTasks Platform</div>
+                <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
+                <p style="color:#888;margin:0;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
+            </div>
+
+            <div class="video-grid">
+                <div class="video-card">
+                    <video autoplay muted loop playsinline>
+                        <source src="/attached_assets/generated_videos/asian-man-remote-work.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
+                </div>
+                <div class="video-card">
+                    <video autoplay muted loop playsinline>
+                        <source src="/attached_assets/generated_videos/black-woman-remote-work.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
+                </div>
+                <div class="video-card">
+                    <video autoplay muted loop playsinline>
+                        <source src="/attached_assets/generated_videos/hispanic-woman-remote-work.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
+                </div>
+            </div>
         </div>
 
         <!-- PROFILE -->
