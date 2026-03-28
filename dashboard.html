@@ -8,23 +8,45 @@
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; overflow-x: hidden; }
-        
-        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #333; }
+
+        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #333; box-sizing: border-box; }
+        .sidebar-logo { font-size: 20px; font-weight: bold; color: var(--primary); margin-bottom: 6px; }
+        .sidebar-email { font-size: 11px; color: #777; margin-bottom: 24px; word-break: break-all; }
         .nav-item { padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border-radius: 8px; transition: 0.2s; }
         .nav-item:hover { background: rgba(255,255,255,0.1); }
         .nav-item.active { background: var(--primary) !important; color: white !important; }
-        
         .logout-btn { margin-top: auto; color: #ff4d4d !important; border-top: 1px solid #333; padding-top: 20px; }
 
-        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; min-height: 100vh; }
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; min-height: 100vh; box-sizing: border-box; }
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
-        .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 40px; border-radius: 20px; background: rgba(124, 77, 255, 0.05); margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        /* Profile form */
+        .profile-form { max-width: 560px; }
+        .profile-form h1 { margin-bottom: 6px; }
+        .profile-form .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 28px; }
+        .form-section { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); margin: 24px 0 8px; }
+        .profile-form input, .profile-form select { width: 100%; padding: 12px 14px; margin: 6px 0; border-radius: 8px; border: 1px solid #333; background: rgba(255,255,255,0.05); color: white; font-size: 0.95rem; box-sizing: border-box; }
+        .profile-form select option { background: #1a1a2e; }
+        .profile-form input[type="file"] { padding: 10px; font-size: 0.85rem; color: #aaa; cursor: pointer; }
+        .file-label { font-size: 0.82rem; color: #888; margin: 8px 0 2px; display: block; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; margin-top: 20px; transition: 0.3s; width: 100%; }
+        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .save-msg { margin-top: 12px; font-size: 0.9rem; }
+        .save-msg.success { color: var(--success); }
+        .save-msg.error { color: #ff6b6b; }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .status-Pending { background: rgba(255,184,0,0.15); color: #ffb800; }
+        .status-Accepted { background: rgba(0,255,163,0.15); color: var(--success); }
+        .status-Rejected { background: rgba(255,77,77,0.15); color: #ff4d4d; }
+
+        /* Lock/restricted */
+        .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 40px; border-radius: 20px; background: rgba(124,77,255,0.05); margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto; }
         .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; transition: 0.3s; }
         .btn-verify:hover { opacity: 0.9; transform: translateY(-2px); }
-        
-        .payment-box { background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; text-align: left; border-left: 4px solid var(--success); margin-top: 20px; }
+        .payment-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; text-align: left; border-left: 4px solid var(--success); margin-top: 20px; }
         .payment-box p { margin: 8px 0; font-size: 0.95em; }
         .copyable { color: var(--success); font-family: monospace; font-size: 1.2em; letter-spacing: 1px; }
     </style>
@@ -32,60 +54,149 @@
 <body>
 
     <div class="sidebar">
-        <h2 style="color: var(--primary); margin-bottom: 30px;">CloudTasks</h2>
-        <div class="nav-item active" onclick="navTo('home', this)"> <i class="fa-solid fa-house"></i> Home Page </div>
-        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"> <i class="fa-solid fa-user"></i> User Profile </div>
-        
-        <div class="nav-item" onclick="navLock('Available Tasks', this)"> <i class="fa-solid fa-list-check"></i> Available Tasks </div>
-        <div class="nav-item" onclick="navLock('My Projects', this)"> <i class="fa-solid fa-diagram-project"></i> My Projects </div>
-        <div class="nav-item" onclick="navLock('My Wallet', this)"> <i class="fa-solid fa-wallet"></i> My Wallet </div>
-        
-        <div class="nav-item logout-btn" onclick="handleLogout()"> <i class="fa-solid fa-right-from-bracket"></i> Logout </div>
+        <div class="sidebar-logo"><i class="fa-solid fa-cloud"></i> CloudTasks</div>
+        <div class="sidebar-email" id="sidebarEmail">Loading...</div>
+        <div class="nav-item active" onclick="navTo('home', this)"><i class="fa-solid fa-house"></i> Home</div>
+        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"><i class="fa-solid fa-user"></i> My Profile</div>
+        <div class="nav-item" onclick="navLock('Available Tasks', this)"><i class="fa-solid fa-list-check"></i> Available Tasks</div>
+        <div class="nav-item" onclick="navLock('My Projects', this)"><i class="fa-solid fa-diagram-project"></i> My Projects</div>
+        <div class="nav-item" onclick="navLock('My Wallet', this)"><i class="fa-solid fa-wallet"></i> My Wallet</div>
+        <div class="nav-item logout-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
     </div>
 
     <div class="main-content">
+
         <div id="home" class="view-section active">
-            <h1>Welcome to CloudTasks</h1>
-            <p>Your dashboard is active.</p>
+            <h1>Welcome to CloudTasks 👋</h1>
+            <p style="color:#888;">Head over to <strong style="color:white;">My Profile</strong> to complete your details and get verified.</p>
         </div>
 
         <div id="profile" class="view-section">
-            <h1>User Profile</h1>
-            <p>Complete your details here to get verified.</p>
+            <div class="profile-form">
+                <h1>My Profile</h1>
+                <p class="subtitle">Complete your details to get verified. <span id="statusBadge"></span></p>
+
+                <div class="form-section">Personal Info</div>
+                <input type="text" id="fullName" placeholder="Full Name">
+                <input type="tel" id="phoneNumber" placeholder="Phone Number">
+                <input type="text" id="education" placeholder="Highest Education Level">
+                <input type="text" id="referralCode" placeholder="Referral Code (optional)">
+
+                <div class="form-section">Payout Info</div>
+                <select id="paymentMethod">
+                    <option value="" disabled>Select Payment Method</option>
+                    <option value="M-Pesa">M-Pesa</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="PayPal">PayPal</option>
+                </select>
+                <input type="text" id="payoutAccount" placeholder="Payout Account Number / Name">
+                <input type="text" id="paymentRef" placeholder="Payment Reference (optional)">
+
+                <div class="form-section">Identity Verification</div>
+                <label class="file-label">ID Photo (optional — upload or replace)</label>
+                <input type="file" id="idPhoto" accept="image/png,image/jpeg,image/jpg">
+                <label class="file-label">Selfie Photo (optional — upload or replace)</label>
+                <input type="file" id="selfiePhoto" accept="image/png,image/jpeg,image/jpg">
+
+                <button class="btn-save" id="saveBtn" onclick="saveProfile()">Save Profile</button>
+                <div class="save-msg" id="saveMsg"></div>
+            </div>
         </div>
 
         <div id="restricted" class="view-section">
             <div class="lock-card">
                 <div id="lockMessage">
-                    <i class="fa-solid fa-shield-halved" style="font-size: 60px; color: #ff4d4d; margin-bottom: 20px;"></i>
+                    <i class="fa-solid fa-shield-halved" style="font-size:60px;color:#ff4d4d;margin-bottom:20px;"></i>
                     <h2 id="displayTitle">Section Restricted</h2>
-                    <h3 style="color: #b0b0b0;">Membership Verification Required</h3>
+                    <h3 style="color:#b0b0b0;">Membership Verification Required</h3>
                     <p>Please verify your identity and subscribe to unlock this feature.</p>
                     <button class="btn-verify" onclick="showPaybill()">Confirm Membership Application</button>
                 </div>
-
-                <div id="paybillView" style="display: none;">
-                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 50px; color: var(--success); margin-bottom: 15px;"></i>
-                    <h2 style="color: var(--success);">Payment Details</h2>
+                <div id="paybillView" style="display:none;">
+                    <i class="fa-solid fa-mobile-screen-button" style="font-size:50px;color:var(--success);margin-bottom:15px;"></i>
+                    <h2 style="color:var(--success);">Payment Details</h2>
                     <p>Use the M-Pesa details below to pay your $25 fee.</p>
-                    
                     <div class="payment-box">
                         <p><strong>Business NO:</strong> <span class="copyable">542542</span></p>
                         <p><strong>Account NO:</strong> <span class="copyable">05508726426150</span></p>
                     </div>
-
-                    <p style="font-size: 0.8em; color: #ffb800; margin-top: 15px;">
-                        *Once paid, your status will update within 30 minutes.
-                    </p>
-                    <button class="btn-verify" style="background: var(--success); color: #000;" onclick="navTo('profile', document.getElementById('profileTrigger'))">I Have Paid</button>
+                    <p style="font-size:0.8em;color:#ffb800;margin-top:15px;">*Once paid, your status will update within 30 minutes.</p>
+                    <button class="btn-verify" style="background:var(--success);color:#000;" onclick="navTo('profile', document.getElementById('profileTrigger'))">I Have Paid</button>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script>
-        // STORAGE REMOVED: This page no longer checks for "logged in" status.
-        // It relies on your server to point the user to the right page.
+        let currentUser = null;
+
+        async function init() {
+            try {
+                const res = await fetch('/api/user/profile');
+                if (!res.ok) { window.location.replace('/login.html'); return; }
+                currentUser = await res.json();
+                document.getElementById('sidebarEmail').textContent = currentUser.email;
+                prefillProfile(currentUser);
+            } catch (e) {
+                window.location.replace('/login.html');
+            }
+        }
+
+        function prefillProfile(u) {
+            document.getElementById('fullName').value = u.fullName || '';
+            document.getElementById('phoneNumber').value = u.phoneNumber || '';
+            document.getElementById('education').value = u.education || '';
+            document.getElementById('referralCode').value = u.referralCode || '';
+            document.getElementById('paymentMethod').value = u.paymentMethod || '';
+            document.getElementById('payoutAccount').value = u.payoutAccount || '';
+            document.getElementById('paymentRef').value = u.paymentRef || '';
+            const status = u.status || 'Pending';
+            const badge = document.getElementById('statusBadge');
+            badge.innerHTML = `<span class="status-badge status-${status}">${status}</span>`;
+        }
+
+        async function saveProfile() {
+            if (!currentUser) return;
+            const btn = document.getElementById('saveBtn');
+            const msg = document.getElementById('saveMsg');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            msg.textContent = '';
+
+            const formData = new FormData();
+            formData.append('email', currentUser.email);
+            formData.append('fullName', document.getElementById('fullName').value.trim());
+            formData.append('phoneNumber', document.getElementById('phoneNumber').value.trim());
+            formData.append('education', document.getElementById('education').value.trim());
+            formData.append('referralCode', document.getElementById('referralCode').value.trim());
+            formData.append('paymentMethod', document.getElementById('paymentMethod').value);
+            formData.append('payoutAccount', document.getElementById('payoutAccount').value.trim());
+            formData.append('paymentRef', document.getElementById('paymentRef').value.trim());
+            const idPhoto = document.getElementById('idPhoto').files[0];
+            const selfiePhoto = document.getElementById('selfiePhoto').files[0];
+            if (idPhoto) formData.append('idPhoto', idPhoto);
+            if (selfiePhoto) formData.append('selfiePhoto', selfiePhoto);
+
+            try {
+                const res = await fetch('/api/user/update-profile', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok) {
+                    msg.className = 'save-msg success';
+                    msg.textContent = 'Profile saved successfully!';
+                    const freshRes = await fetch('/api/user/profile');
+                    if (freshRes.ok) { currentUser = await freshRes.json(); prefillProfile(currentUser); }
+                } else {
+                    msg.className = 'save-msg error';
+                    msg.textContent = data.message || 'Failed to save. Please try again.';
+                }
+            } catch (e) {
+                msg.className = 'save-msg error';
+                msg.textContent = 'Network error. Please try again.';
+            }
+            btn.disabled = false;
+            btn.textContent = 'Save Profile';
+        }
 
         function wipeState() {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
@@ -97,20 +208,14 @@
         function navTo(id, el) {
             wipeState();
             const target = document.getElementById(id);
-            if(target) {
-                target.classList.add('active');
-                el.classList.add('active');
-            }
+            if (target) { target.classList.add('active'); el.classList.add('active'); }
         }
 
         function navLock(title, el) {
             wipeState();
-            const restricted = document.getElementById('restricted');
-            if(restricted) {
-                restricted.classList.add('active');
-                document.getElementById('displayTitle').innerText = title;
-                el.classList.add('active');
-            }
+            document.getElementById('restricted').classList.add('active');
+            document.getElementById('displayTitle').innerText = title;
+            el.classList.add('active');
         }
 
         function showPaybill() {
@@ -118,10 +223,12 @@
             document.getElementById('paybillView').style.display = 'block';
         }
 
-        function handleLogout() {
-            // Just redirect—nothing to clear since we aren't saving anything!
-            window.location.replace('login.html');
+        async function handleLogout() {
+            await fetch('/api/logout', { method: 'POST' }).catch(() => {});
+            window.location.replace('/login.html');
         }
+
+        init();
     </script>
 </body>
 </html>

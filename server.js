@@ -154,7 +154,27 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 4. Admin Routes
+// 4. Logout — clears the session cookie
+app.post('/api/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Logged out' });
+});
+
+// 5. Get current user profile (reads JWT from cookie)
+app.get('/api/user/profile', async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: 'Not authenticated' });
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid session' });
+  }
+});
+
+// 5. Admin Routes
 app.get('/api/admin/users', async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
