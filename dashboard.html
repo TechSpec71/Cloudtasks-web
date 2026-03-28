@@ -7,42 +7,95 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; margin: 0; display: flex; color: white; overflow-x: hidden; }
 
-        .sidebar { width: var(--sidebar-w); background: #000; height: 100vh; position: fixed; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #333; box-sizing: border-box; }
-        .sidebar-logo { font-size: 20px; font-weight: bold; color: var(--primary); margin-bottom: 6px; }
-        .sidebar-email { font-size: 11px; color: #777; margin-bottom: 24px; word-break: break-all; }
-        .nav-item { padding: 12px; color: #b0b0b0; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border-radius: 8px; transition: 0.2s; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); }
-        .nav-item.active { background: var(--primary) !important; color: white !important; }
-        .logout-btn { margin-top: auto; color: #ff4d4d !important; border-top: 1px solid #333; padding-top: 20px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            margin: 0; min-height: 100vh; color: white; display: flex;
+        }
 
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column;
+            padding: 30px 20px;
+            height: 100vh; position: fixed;
+            box-sizing: border-box; z-index: 100;
+        }
+
+        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; margin-bottom: 6px; }
+        .logo i { color: var(--primary); font-size: 28px; }
+        .sidebar-email { font-size: 11px; color: #666; margin-bottom: 28px; word-break: break-all; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 15px; border-radius: 12px;
+            color: #b0b0b0; text-decoration: none;
+            transition: 0.3s; margin-bottom: 8px; cursor: pointer;
+        }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; }
+
+        /* --- MAIN CONTENT --- */
         .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 40px; min-height: 100vh; box-sizing: border-box; }
         .view-section { display: none !important; }
         .view-section.active { display: block !important; }
 
-        /* Profile form */
-        .profile-form { max-width: 560px; }
-        .profile-form h1 { margin-bottom: 6px; }
-        .profile-form .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 28px; }
-        .form-section { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); margin: 24px 0 8px; }
-        .profile-form input, .profile-form select { width: 100%; padding: 12px 14px; margin: 6px 0; border-radius: 8px; border: 1px solid #333; background: rgba(255,255,255,0.05); color: white; font-size: 0.95rem; box-sizing: border-box; }
-        .profile-form select option { background: #1a1a2e; }
-        .profile-form input[type="file"] { padding: 10px; font-size: 0.85rem; color: #aaa; cursor: pointer; }
-        .file-label { font-size: 0.82rem; color: #888; margin: 8px 0 2px; display: block; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; margin-top: 20px; transition: 0.3s; width: 100%; }
-        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .save-msg { margin-top: 12px; font-size: 0.9rem; }
-        .save-msg.success { color: var(--success); }
-        .save-msg.error { color: #ff6b6b; }
+        /* --- PROFILE CARD GRID (from original) --- */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px; width: 100%; max-width: 900px;
+        }
 
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        .status-Pending { background: rgba(255,184,0,0.15); color: #ffb800; }
-        .status-Accepted { background: rgba(0,255,163,0.15); color: var(--success); }
-        .status-Rejected { background: rgba(255,77,77,0.15); color: #ff4d4d; }
+        .glass-card {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 40px;
+            position: relative; transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
 
-        /* Lock/restricted */
+        .number-tag {
+            position: absolute; top: -15px; left: -15px; background: var(--primary);
+            width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; font-size: 18px;
+        }
+
+        .card-icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+        .glass-card h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
+        .glass-card p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
+
+        .btn-update {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%;
+        }
+        .btn-update:hover { box-shadow: 0 0 15px var(--primary); opacity: 0.9; }
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+        .modal-content { background: #16213e; margin: 5% auto; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content input, .modal-content select {
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px;
+            border: 1px solid #30363d; background: #0d1117; color: white;
+            box-sizing: border-box; outline: none; font-size: 0.95rem;
+        }
+        .modal-content select option { background: #0d1117; }
+        .phone-row { display: flex; gap: 10px; }
+        .prefix-box { width: 90px !important; text-align: center; font-weight: bold; color: var(--primary); flex-shrink: 0; }
+        .upload-area { display: block; padding: 20px; background: #0d1117; border: 2px dashed #30363d; border-radius: 12px; text-align: center; cursor: pointer; margin: 12px 0; transition: 0.3s; color: #b0b0b0; }
+        .upload-area:hover { border-color: var(--primary); color: white; }
+        .upload-area input[type="file"] { display: none; }
+        .modal-msg { font-size: 0.85rem; margin-top: 10px; min-height: 18px; }
+        .modal-msg.success { color: var(--success); }
+        .modal-msg.error { color: #ff6b6b; }
+        .btn-cancel { background: transparent; border: 1px solid #444; color: #aaa; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; font-size: 0.95rem; transition: 0.3s; }
+        .btn-cancel:hover { border-color: #888; color: white; }
+
+        /* --- LOCK / RESTRICTED --- */
         .lock-card { text-align: center; border: 2px dashed var(--primary); padding: 40px; border-radius: 20px; background: rgba(124,77,255,0.05); margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto; }
         .btn-verify { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; transition: 0.3s; }
         .btn-verify:hover { opacity: 0.9; transform: translateY(-2px); }
@@ -54,55 +107,78 @@
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-logo"><i class="fa-solid fa-cloud"></i> CloudTasks</div>
+        <div class="logo"><i class="fa-solid fa-cloud"></i><span>CloudTasks</span></div>
         <div class="sidebar-email" id="sidebarEmail">Loading...</div>
-        <div class="nav-item active" onclick="navTo('home', this)"><i class="fa-solid fa-house"></i> Home</div>
-        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"><i class="fa-solid fa-user"></i> My Profile</div>
+
+        <div class="nav-item active" onclick="navTo('home', this)"><i class="fa-solid fa-house"></i> Home Page</div>
+        <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this)"><i class="fa-solid fa-user-circle"></i> User Profile</div>
         <div class="nav-item" onclick="navLock('Available Tasks', this)"><i class="fa-solid fa-list-check"></i> Available Tasks</div>
         <div class="nav-item" onclick="navLock('My Projects', this)"><i class="fa-solid fa-diagram-project"></i> My Projects</div>
         <div class="nav-item" onclick="navLock('My Wallet', this)"><i class="fa-solid fa-wallet"></i> My Wallet</div>
-        <div class="nav-item logout-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+
+        <div style="margin-top: auto;">
+            <div class="nav-item" style="color:#e74c3c;" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+        </div>
     </div>
 
     <div class="main-content">
 
+        <!-- HOME -->
         <div id="home" class="view-section active">
-            <h1>Welcome to CloudTasks 👋</h1>
-            <p style="color:#888;">Head over to <strong style="color:white;">My Profile</strong> to complete your details and get verified.</p>
+            <h1>Welcome to CloudTasks</h1>
+            <p style="color:#888;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
         </div>
 
+        <!-- PROFILE — 5-card grid -->
         <div id="profile" class="view-section">
-            <div class="profile-form">
-                <h1>My Profile</h1>
-                <p class="subtitle">Complete your details to get verified. <span id="statusBadge"></span></p>
+            <h1 style="margin-bottom:8px;">User Profile</h1>
+            <p style="color:#888;margin-bottom:32px;">Account status: <span id="statusBadge" style="font-weight:bold;color:white;">—</span></p>
+            <div class="profile-grid">
 
-                <div class="form-section">Personal Info</div>
-                <input type="text" id="fullName" placeholder="Full Name">
-                <input type="tel" id="phoneNumber" placeholder="Phone Number">
-                <input type="text" id="education" placeholder="Highest Education Level">
-                <input type="text" id="referralCode" placeholder="Referral Code (optional)">
+                <div class="glass-card">
+                    <div class="number-tag">01</div>
+                    <div class="card-icon"><i class="fa-solid fa-user-gear"></i></div>
+                    <h3>Personal Profile</h3>
+                    <p>Manage account settings and contact information.</p>
+                    <button class="btn-update" onclick="openModal('personalModal')">UPDATE INFO</button>
+                </div>
 
-                <div class="form-section">Payout Info</div>
-                <select id="paymentMethod">
-                    <option value="" disabled>Select Payment Method</option>
-                    <option value="M-Pesa">M-Pesa</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="PayPal">PayPal</option>
-                </select>
-                <input type="text" id="payoutAccount" placeholder="Payout Account Number / Name">
-                <input type="text" id="paymentRef" placeholder="Payment Reference (optional)">
+                <div class="glass-card">
+                    <div class="number-tag">02</div>
+                    <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h3>Educational Profile</h3>
+                    <p>Showcase your academic level and professional certifications.</p>
+                    <button class="btn-update" onclick="openModal('eduModal')">UPDATE EDUCATION</button>
+                </div>
 
-                <div class="form-section">Identity Verification</div>
-                <label class="file-label">ID Photo (optional — upload or replace)</label>
-                <input type="file" id="idPhoto" accept="image/png,image/jpeg,image/jpg">
-                <label class="file-label">Selfie Photo (optional — upload or replace)</label>
-                <input type="file" id="selfiePhoto" accept="image/png,image/jpeg,image/jpg">
+                <div class="glass-card">
+                    <div class="number-tag">03</div>
+                    <div class="card-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <h3>Identity Verification</h3>
+                    <p>Secure account with official document logs.</p>
+                    <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
+                </div>
 
-                <button class="btn-save" id="saveBtn" onclick="saveProfile()">Save Profile</button>
-                <div class="save-msg" id="saveMsg"></div>
+                <div class="glass-card">
+                    <div class="number-tag">04</div>
+                    <div class="card-icon"><i class="fa-solid fa-building-columns"></i></div>
+                    <h3>Payment Account Details</h3>
+                    <p>Set up your Payout details to receive your earnings.</p>
+                    <button class="btn-update" onclick="openModal('bankModal')">UPDATE DETAILS</button>
+                </div>
+
+                <div class="glass-card">
+                    <div class="number-tag">05</div>
+                    <div class="card-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <h3>Task / Member Access</h3>
+                    <p>Activate membership to unlock tasks.</p>
+                    <button class="btn-update" onclick="openModal('paymentModal')">GET ACCESS</button>
+                </div>
+
             </div>
         </div>
 
+        <!-- RESTRICTED -->
         <div id="restricted" class="view-section">
             <div class="lock-card">
                 <div id="lockMessage">
@@ -128,8 +204,103 @@
 
     </div>
 
+    <!-- MODAL: Personal Info -->
+    <div id="personalModal" class="modal">
+        <div class="modal-content">
+            <h2>Personal Info</h2>
+            <input type="text" id="fullName" placeholder="Full Name as per ID">
+            <select id="countrySelect" onchange="updatePrefix()">
+                <option value="">Select Country</option>
+            </select>
+            <div class="phone-row">
+                <input type="text" id="phonePrefix" class="prefix-box" placeholder="+..." readonly>
+                <input type="text" id="pNumber" placeholder="Phone Number">
+            </div>
+            <input type="text" id="referralCode" placeholder="Referral Code (optional)">
+            <button class="btn-update" style="margin-top:15px;" onclick="savePersonal()">Save Changes</button>
+            <div class="modal-msg" id="personalMsg"></div>
+            <button class="btn-cancel" onclick="closeModal('personalModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Education -->
+    <div id="eduModal" class="modal">
+        <div class="modal-content">
+            <h2>Education Profile</h2>
+            <select id="eduLevel">
+                <option value="">Select Education Level</option>
+                <option>High School / Secondary</option>
+                <option>Vocational / Diploma</option>
+                <option>Bachelor's Degree</option>
+                <option>Master's Degree</option>
+                <option>PhD / Doctorate</option>
+            </select>
+            <button class="btn-update" style="margin-top:15px;" onclick="saveEducation()">Save Education</button>
+            <div class="modal-msg" id="eduMsg"></div>
+            <button class="btn-cancel" onclick="closeModal('eduModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Identity -->
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <h2>Verify Identity</h2>
+            <label class="upload-area" for="idFront">
+                <i class="fa-solid fa-id-card" style="font-size:24px;margin-bottom:8px;display:block;"></i>
+                <span id="idFrontLabel">ID Card (Front)</span>
+                <input type="file" id="idFront" accept="image/*" onchange="updateLabel('idFront','idFrontLabel')">
+            </label>
+            <label class="upload-area" for="selfie">
+                <i class="fa-solid fa-camera-retro" style="font-size:24px;margin-bottom:8px;display:block;"></i>
+                <span id="selfieLabel">Live Selfie</span>
+                <input type="file" id="selfie" accept="image/*" onchange="updateLabel('selfie','selfieLabel')">
+            </label>
+            <button class="btn-update" style="margin-top:15px;" onclick="saveIdentity()">Submit Documents</button>
+            <div class="modal-msg" id="idMsg"></div>
+            <button class="btn-cancel" onclick="closeModal('idModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Payout -->
+    <div id="bankModal" class="modal">
+        <div class="modal-content">
+            <h2>Payout Details</h2>
+            <select id="paymentMethod">
+                <option value="">Select Payment Method</option>
+                <option value="M-Pesa">M-Pesa / Mobile Money</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="PayPal">PayPal</option>
+            </select>
+            <input type="text" id="payoutAccount" placeholder="Account Number / Phone">
+            <input type="text" id="paymentRef" placeholder="Payment Reference (optional)">
+            <button class="btn-update" style="margin-top:15px;" onclick="savePayout()">Save Details</button>
+            <div class="modal-msg" id="bankMsg"></div>
+            <button class="btn-cancel" onclick="closeModal('bankModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Membership / Task Access -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:40px;color:#2ecc71;margin-bottom:12px;display:block;"></i>
+            <h2>Subscribe for $25 / year</h2>
+            <p style="color:#b0b0b0;">Gain full access to tasks and projects.</p>
+            <div class="payment-box" style="text-align:left;margin-bottom:16px;">
+                <p><strong>M-Pesa Business NO:</strong> <span class="copyable">542542</span></p>
+                <p><strong>Account NO:</strong> <span class="copyable">05508726426150</span></p>
+            </div>
+            <button class="btn-update" style="padding:15px;" onclick="closeModal('paymentModal'); navTo('profile', document.getElementById('profileTrigger'))">I Have Paid</button>
+            <button class="btn-cancel" onclick="closeModal('paymentModal')">Cancel</button>
+        </div>
+    </div>
+
     <script>
         let currentUser = null;
+
+        const countryData = [
+            {n:"Kenya",c:"+254"},{n:"Uganda",c:"+256"},{n:"Tanzania",c:"+255"},
+            {n:"Nigeria",c:"+234"},{n:"South Africa",c:"+27"},{n:"USA",c:"+1"},{n:"UK",c:"+44"}
+        ];
 
         async function init() {
             try {
@@ -137,65 +308,112 @@
                 if (!res.ok) { window.location.replace('/login.html'); return; }
                 currentUser = await res.json();
                 document.getElementById('sidebarEmail').textContent = currentUser.email;
-                prefillProfile(currentUser);
+                const status = currentUser.status || 'Pending';
+                document.getElementById('statusBadge').textContent = status;
+
+                // Pre-fill modal fields
+                document.getElementById('fullName').value = currentUser.fullName || '';
+                document.getElementById('pNumber').value = currentUser.phoneNumber || '';
+                document.getElementById('referralCode').value = currentUser.referralCode || '';
+                if (currentUser.education) document.getElementById('eduLevel').value = currentUser.education;
+                if (currentUser.paymentMethod) document.getElementById('paymentMethod').value = currentUser.paymentMethod;
+                document.getElementById('payoutAccount').value = currentUser.payoutAccount || '';
+                document.getElementById('paymentRef').value = currentUser.paymentRef || '';
             } catch (e) {
                 window.location.replace('/login.html');
             }
+
+            // Populate country dropdown
+            const sel = document.getElementById('countrySelect');
+            countryData.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.n; opt.textContent = c.n; sel.appendChild(opt);
+            });
         }
 
-        function prefillProfile(u) {
-            document.getElementById('fullName').value = u.fullName || '';
-            document.getElementById('phoneNumber').value = u.phoneNumber || '';
-            document.getElementById('education').value = u.education || '';
-            document.getElementById('referralCode').value = u.referralCode || '';
-            document.getElementById('paymentMethod').value = u.paymentMethod || '';
-            document.getElementById('payoutAccount').value = u.payoutAccount || '';
-            document.getElementById('paymentRef').value = u.paymentRef || '';
-            const status = u.status || 'Pending';
-            const badge = document.getElementById('statusBadge');
-            badge.innerHTML = `<span class="status-badge status-${status}">${status}</span>`;
+        function updatePrefix() {
+            const sel = document.getElementById('countrySelect');
+            const country = countryData.find(c => c.n === sel.value);
+            document.getElementById('phonePrefix').value = country ? country.c : '';
         }
 
-        async function saveProfile() {
-            if (!currentUser) return;
-            const btn = document.getElementById('saveBtn');
-            const msg = document.getElementById('saveMsg');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
+        function updateLabel(inputId, labelId) {
+            const file = document.getElementById(inputId).files[0];
+            if (file) document.getElementById(labelId).textContent = file.name;
+        }
+
+        async function postFormData(data, msgId) {
+            const msg = document.getElementById(msgId);
             msg.textContent = '';
-
-            const formData = new FormData();
-            formData.append('email', currentUser.email);
-            formData.append('fullName', document.getElementById('fullName').value.trim());
-            formData.append('phoneNumber', document.getElementById('phoneNumber').value.trim());
-            formData.append('education', document.getElementById('education').value.trim());
-            formData.append('referralCode', document.getElementById('referralCode').value.trim());
-            formData.append('paymentMethod', document.getElementById('paymentMethod').value);
-            formData.append('payoutAccount', document.getElementById('payoutAccount').value.trim());
-            formData.append('paymentRef', document.getElementById('paymentRef').value.trim());
-            const idPhoto = document.getElementById('idPhoto').files[0];
-            const selfiePhoto = document.getElementById('selfiePhoto').files[0];
-            if (idPhoto) formData.append('idPhoto', idPhoto);
-            if (selfiePhoto) formData.append('selfiePhoto', selfiePhoto);
-
+            if (!currentUser) return false;
+            data.append('email', currentUser.email);
             try {
-                const res = await fetch('/api/user/update-profile', { method: 'POST', body: formData });
-                const data = await res.json();
+                const res = await fetch('/api/user/update-profile', { method: 'POST', body: data });
+                const json = await res.json();
                 if (res.ok) {
-                    msg.className = 'save-msg success';
-                    msg.textContent = 'Profile saved successfully!';
-                    const freshRes = await fetch('/api/user/profile');
-                    if (freshRes.ok) { currentUser = await freshRes.json(); prefillProfile(currentUser); }
+                    msg.className = 'modal-msg success';
+                    msg.textContent = 'Saved successfully!';
+                    const fresh = await fetch('/api/user/profile');
+                    if (fresh.ok) currentUser = await fresh.json();
+                    return true;
                 } else {
-                    msg.className = 'save-msg error';
-                    msg.textContent = data.message || 'Failed to save. Please try again.';
+                    msg.className = 'modal-msg error';
+                    msg.textContent = json.message || 'Failed. Please try again.';
+                    return false;
                 }
             } catch (e) {
-                msg.className = 'save-msg error';
+                msg.className = 'modal-msg error';
                 msg.textContent = 'Network error. Please try again.';
+                return false;
             }
-            btn.disabled = false;
-            btn.textContent = 'Save Profile';
+        }
+
+        async function savePersonal() {
+            const fd = new FormData();
+            fd.append('fullName', document.getElementById('fullName').value.trim());
+            const prefix = document.getElementById('phonePrefix').value;
+            const num = document.getElementById('pNumber').value.trim();
+            fd.append('phoneNumber', prefix ? prefix + num : num);
+            fd.append('referralCode', document.getElementById('referralCode').value.trim());
+            await postFormData(fd, 'personalMsg');
+        }
+
+        async function saveEducation() {
+            const fd = new FormData();
+            fd.append('education', document.getElementById('eduLevel').value);
+            await postFormData(fd, 'eduMsg');
+        }
+
+        async function saveIdentity() {
+            const fd = new FormData();
+            const idFile = document.getElementById('idFront').files[0];
+            const selfieFile = document.getElementById('selfie').files[0];
+            if (idFile) fd.append('idPhoto', idFile);
+            if (selfieFile) fd.append('selfiePhoto', selfieFile);
+            if (!idFile && !selfieFile) {
+                const msg = document.getElementById('idMsg');
+                msg.className = 'modal-msg error';
+                msg.textContent = 'Please select at least one file to upload.';
+                return;
+            }
+            await postFormData(fd, 'idMsg');
+        }
+
+        async function savePayout() {
+            const fd = new FormData();
+            fd.append('paymentMethod', document.getElementById('paymentMethod').value);
+            fd.append('payoutAccount', document.getElementById('payoutAccount').value.trim());
+            fd.append('paymentRef', document.getElementById('paymentRef').value.trim());
+            await postFormData(fd, 'bankMsg');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            ['personalMsg','eduMsg','idMsg','bankMsg'].forEach(m => {
+                const el = document.getElementById(m);
+                if (el) el.textContent = '';
+            });
         }
 
         function wipeState() {
@@ -227,6 +445,8 @@
             await fetch('/api/logout', { method: 'POST' }).catch(() => {});
             window.location.replace('/login.html');
         }
+
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; };
 
         init();
     </script>
