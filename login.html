@@ -132,16 +132,14 @@
         const res = await fetch('/api/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ email, pass })
+            body: JSON.stringify({ email, password: pass })
         });
 
+        const data = await res.json();
         if(res.ok) {
-            const user = await res.json();
-            alert("Login successful! Welcome " + user.firstName);
-            // Redirect to their dashboard
-            // window.location.href = "dashboard.html"; 
+            window.location.href = data.redirect || '/dashboard.html';
         } else {
-            alert("Invalid email or password.");
+            alert(data.message || "Invalid email or password.");
         }
     }
 </script>

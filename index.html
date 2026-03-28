@@ -3,96 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudTasks - Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <title>Cloudtasks | Register</title>
     <style>
-        :root { --primary: #7c4dff; --bg: #1a1a2e; --sidebar-w: 260px; --success: #00ffa3; }
-        
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            margin: 0; min-height: 100vh; color: white;
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --glass: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: var(--text-main);
             display: flex;
+            flex-direction: column;
         }
 
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex; flex-direction: column;
-            padding: 30px 20px;
-            height: 100vh; position: fixed;
-            box-sizing: border-box; z-index: 100;
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .logo {
-            font-size: 24px; font-weight: bold; display: flex;
-            align-items: center; gap: 12px; color: white;
-            text-decoration: none; margin-bottom: 40px;
-        }
-        .logo i { color: var(--primary); font-size: 28px; }
+        .logo-container { display: flex; align-items: center; gap: 12px; }
+        .cloud-svg { width: 40px; height: 40px; color: var(--primary); }
+        .logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .main-word { font-size: 24px; font-weight: 900; letter-spacing: 1px; }
+        .sub-word { font-size: 10px; font-weight: bold; letter-spacing: 4px; color: var(--secondary); }
 
-        .nav-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 12px 15px; border-radius: 12px;
-            color: #b0b0b0; text-decoration: none;
-            transition: 0.3s; margin-bottom: 8px; cursor: pointer;
-        }
-        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
-        .nav-item i { width: 20px; text-align: center; }
-
-        /* --- MAIN CONTENT AREA --- */
-        .main-content {
-            flex: 1; margin-left: var(--sidebar-w);
-            padding: 40px; min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-
-        /* --- TASK GRID STYLES --- */
-        .task-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px; margin-top: 20px;
-        }
-
-        .task-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px; padding: 25px;
-            transition: 0.3s ease; position: relative;
-        }
-        .task-card:hover { transform: translateY(-5px); border-color: var(--primary); background: rgba(255, 255, 255, 0.08); }
-        
-        .task-card .loc { font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .task-card h3 { font-size: 16px; margin: 10px 0; height: 40px; overflow: hidden; }
-        .task-card .price { font-size: 20px; color: var(--success); font-weight: bold; margin-bottom: 15px; }
-
-        /* --- PROFILE CARD STYLES --- */
-        .container { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 30px; width: 100%; max-width: 900px;
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 40px;
-            position: relative; transition: 0.3s ease; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        
-        .number-tag {
-            position: absolute; top: -15px; left: -15px; background: var(--primary);
-            width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center;
-            justify-content: center; font-weight: bold; font-size: 18px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
 
-        h3 { margin: 15px 0 10px; text-transform: uppercase; font-size: 18px; color: #fff; }
-        p { font-size: 14px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px; }
-        .icon { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+        h2 { margin-bottom: 24px; font-weight: 600; }
+
+        .section-label {
+            text-align: left;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            margin: 20px 0 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            margin: 6px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        select option { background: #302b63; }
+
+        .file-label {
+            display: block;
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin: 10px 0 4px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #5b4bc4; transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .back-link {
+            margin-top: 20px;
+            display: block;
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .msg { margin-top: 14px; font-size: 0.9rem; }
+        .msg.success { color: #00ffa3; }
+        .msg.error { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <svg class="cloud-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19c2.5 0 4.5-2 4.5-4.5 0-2-1.5-3.5-3.5-4-0.5-3-3-5.5-6-5.5s-5.5 2.5-6 5.5c-2 0.5-3.5 2-3.5 4 0 2.5 2 4.5 4.5 4.5" />
+        </svg>
+        <div class="logo-text">
+            <span class="main-word">CLOUD</span>
+            <span class="sub-word">TASKS</span>
+        </div>
+    </div>
+</header>
+
+<div class="main-wrapper">
+    <div class="glass-card">
+        <h2>Create Account</h2>
+
+        <div class="section-label">Account Details</div>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+
+        <div class="section-label">Personal Info</div>
+        <input type="text" id="fullName" placeholder="Full Name">
+        <input type="tel" id="phoneNumber" placeholder="Phone Number">
+        <input type="text" id="education" placeholder="Highest Education Level">
+        <input type="text" id="referralCode" placeholder="Referral Code (optional)">
+
+        <div class="section-label">Payout Info</div>
+        <select id="paymentMethod">
+            <option value="" disabled selected>Select Payment Method</option>
+            <option value="M-Pesa">M-Pesa</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="PayPal">PayPal</option>
+        </select>
+        <input type="text" id="paymentAccount" placeholder="Payout Account Number / Name">
+        <input type="text" id="paymentRef" placeholder="Payment Reference (optional)">
+
+        <div class="section-label">Identity Verification</div>
+        <label class="file-label">ID Photo</label>
+        <input type="file" id="idPhoto" accept="image/png, image/jpeg, image/jpg">
+        <label class="file-label">Selfie Photo</label>
+        <input type="file" id="selfiePhoto" accept="image/png, image/jpeg, image/jpg">
+
+        <button id="registerBtn" onclick="handleRegister()">Create Account</button>
+        <div id="msg" class="msg"></div>
+        <a href="login.html" class="back-link">Already have an account? Login</a>
+    </div>
+</div>
+
+<script>
+    async function handleRegister() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const fullName = document.getElementById('fullName').value.trim();
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+        const education = document.getElementById('education').value.trim();
+        const referralCode = document.getElementById('referralCode').value.trim();
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const paymentAccount = document.getElementById('paymentAccount').value.trim();
+        const paymentRef = document.getElementById('paymentRef').value.trim();
+        const idPhoto = document.getElementById('idPhoto').files[0];
+        const selfiePhoto = document.getElementById('selfiePhoto').files[0];
+        const msg = document.getElementById('msg');
+        const btn = document.getElementById('registerBtn');
+
+        if (!email || !password || !fullName || !phoneNumber || !paymentAccount) {
+            msg.className = 'msg error';
+            msg.textContent = 'Please fill in all required fields.';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('fullName', fullName);
+        formData.append('phoneNumber', phoneNumber);
+        formData.append('education', education);
+        formData.append('referralCode', referralCode);
+        formData.append('paymentMethod', paymentMethod);
+        formData.append('paymentAccount', paymentAccount);
+        formData.append('paymentRef', paymentRef);
+        if (idPhoto) formData.append('idPhoto', idPhoto);
+        if (selfiePhoto) formData.append('selfiePhoto', selfiePhoto);
+
+        btn.disabled = true;
+        btn.textContent = 'Registering...';
+        msg.textContent = '';
+
+        try {
+            const res = await fetch('/api/register', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (res.ok) {
+                msg.className = 'msg success';
+                msg.textContent = data.message || 'Registration successful! Redirecting to login...';
+                setTimeout(() => window.location.href = '/login.html', 2000);
+            } else {
+                msg.className = 'msg error';
+                msg.textContent = data.message || 'Registration failed. Please try again.';
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        } catch (err) {
+            msg.className = 'msg error';
+            msg.textContent = 'Network error. Please try again.';
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
+        }
+    }
+</script>
+
+</body>
+</html>
