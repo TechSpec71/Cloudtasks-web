@@ -44,7 +44,7 @@ const uploadFields = upload.fields([
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { index: false }));
 
 // --- DATABASE CONNECTION ---
 mongoose.connect(process.env.MONGODB_URI)
