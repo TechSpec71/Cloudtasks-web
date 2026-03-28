@@ -15,7 +15,7 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_key_123';
 
 // Cloudinary Configuration
@@ -180,4 +180,4 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-app.listen(PORT, () => console.log(`✓ Server live on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`✓ Server live on port ${PORT}`));
