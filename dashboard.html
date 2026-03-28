@@ -249,25 +249,44 @@
             padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
         }
 
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px; margin-top: 8px;
+        .video-hero {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 180px);
+            min-height: 340px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+            margin-top: 8px;
         }
-
-        .video-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 18px; overflow: hidden;
-            transition: 0.3s ease;
+        .video-hero video {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.9s ease;
         }
-        .video-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .video-card video { width: 100%; height: 200px; object-fit: cover; display: block; }
-        .video-label {
-            padding: 14px 16px; font-size: 13px;
-            color: #b0b0b0; display: flex; align-items: center; gap: 8px;
+        .video-hero video.active-video { opacity: 1; }
+        .video-hero .vid-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 24px 28px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.72));
+            z-index: 2;
+            display: flex; align-items: center; gap: 10px;
+            color: #ddd; font-size: 13px;
         }
-        .video-label i { color: var(--primary); }
+        .video-hero .vid-overlay i { color: var(--primary); font-size: 16px; }
+        .vid-dots {
+            position: absolute; top: 16px; right: 16px;
+            display: flex; gap: 6px; z-index: 3;
+        }
+        .vid-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .vid-dot.active { background: var(--primary); }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -308,7 +327,7 @@
 
             .lock-card { padding: 24px 16px; }
 
-            .video-grid { grid-template-columns: 1fr; }
+            .video-hero { height: calc(100vh - 200px); border-radius: 12px; }
         }
 
         @media (max-width: 480px) {
@@ -349,24 +368,24 @@
                 <p style="color:#888;margin:0;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
             </div>
 
-            <div class="video-grid">
-                <div class="video-card">
-                    <video autoplay muted loop playsinline>
-                        <source src="/attached_assets/generated_videos/asian-man-remote-work.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
+            <div class="video-hero" id="videoHero">
+                <video class="active-video" id="vid0" muted playsinline loop>
+                    <source src="/attached_assets/generated_videos/asian-man-remote-work.mp4" type="video/mp4">
+                </video>
+                <video id="vid1" muted playsinline loop>
+                    <source src="/attached_assets/generated_videos/black-woman-remote-work.mp4" type="video/mp4">
+                </video>
+                <video id="vid2" muted playsinline loop>
+                    <source src="/attached_assets/generated_videos/hispanic-woman-remote-work.mp4" type="video/mp4">
+                </video>
+                <div class="vid-overlay">
+                    <i class="fa-solid fa-circle-play"></i>
+                    <span id="vidLabel">Remote Work</span>
                 </div>
-                <div class="video-card">
-                    <video autoplay muted loop playsinline>
-                        <source src="/attached_assets/generated_videos/black-woman-remote-work.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
-                </div>
-                <div class="video-card">
-                    <video autoplay muted loop playsinline>
-                        <source src="/attached_assets/generated_videos/hispanic-woman-remote-work.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-label"><i class="fa-solid fa-circle-play"></i> Remote Work</div>
+                <div class="vid-dots">
+                    <div class="vid-dot active" onclick="switchVideo(0)"></div>
+                    <div class="vid-dot" onclick="switchVideo(1)"></div>
+                    <div class="vid-dot" onclick="switchVideo(2)"></div>
                 </div>
             </div>
         </div>
@@ -534,30 +553,16 @@
                 <button class="btn-cancel" onclick="closeModal('memberModal')" style="margin-top:10px;">Cancel</button>
             </div>
 
-            <!-- Step 2: Payment -->
+            <!-- Step 2: Choose Payment Method -->
             <div class="member-step" id="memberStep2">
                 <button class="modal-back" onclick="goToStep1()"><i class="fa-solid fa-arrow-left"></i></button>
                 <h2 style="padding-left:36px;">Membership - $25/year</h2>
-                <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:14px;">Complete payment to activate your CloudTasks membership and unlock all features.</p>
+                <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:14px;">Select a payment method to complete your CloudTasks membership.</p>
 
-                <div class="payment-methods-grid">
-                    <button class="pay-btn-mobile">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
-                        <div style="text-align:left;">
-                            <div>Mobile Money</div>
-                            <div style="font-size:0.75rem;font-weight:normal;color:#aaa;">Pay through CloudTask local merchant</div>
-                        </div>
-                    </button>
-                </div>
-
-                <div class="payment-box" style="margin-top:0;margin-bottom:16px;">
-                    <p style="margin-top:0;font-size:0.82rem;color:#888;">Send $25 to the following:</p>
-                    <p><strong>Business NO:</strong> <span class="copyable">542542</span></p>
-                    <p><strong>ACC NO:</strong> <span class="copyable">05508726426150</span></p>
-                </div>
-
-                <div class="payment-divider">— Other Payment Options —</div>
                 <div class="other-pay-grid">
+                    <button class="pay-btn-other" onclick="goToMobileMoney()" style="border-color:var(--success);color:var(--success);">
+                        <i class="fa-solid fa-mobile-screen-button"></i> Mobile Money
+                    </button>
                     <button class="pay-btn-other" onclick="showNotActive(event)"><i class="fa-brands fa-paypal"></i> PayPal</button>
                     <button class="pay-btn-other" onclick="showNotActive(event)">Adyen</button>
                     <button class="pay-btn-other" onclick="showNotActive(event)">Flutterwave</button>
@@ -568,11 +573,24 @@
                     <button class="pay-btn-other" onclick="showNotActive(event)">More...</button>
                 </div>
 
-                <div style="margin-top:10px;">
-                    <input type="text" class="ref-input" id="memberPayRef" placeholder="Enter Payment Reference Code">
-                    <button class="btn-submit-ref" onclick="submitPayRef()">Submit Reference Code</button>
-                    <div class="modal-msg" id="memberRefMsg"></div>
+                <button class="btn-cancel" onclick="closeModal('memberModal')" style="margin-top:16px;">Cancel</button>
+            </div>
+
+            <!-- Step 3: Pay via CloudTask (Mobile Money) -->
+            <div class="member-step" id="memberStep3">
+                <button class="modal-back" onclick="goToPayment()"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 style="padding-left:36px;">Pay via CloudTask</h2>
+                <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:16px;">Send <strong style="color:white;">$25</strong> to the CloudTask local merchant using the details below, then enter your reference code.</p>
+
+                <div class="payment-box" style="margin-bottom:20px;">
+                    <p style="margin-top:0;font-size:0.8rem;color:#888;text-transform:uppercase;letter-spacing:1px;">CloudTask Local Merchant</p>
+                    <p><strong>Business NO:</strong> <span class="copyable">542542</span></p>
+                    <p style="margin-bottom:0;"><strong>ACC NO:</strong> <span class="copyable">05508726426150</span></p>
                 </div>
+
+                <input type="text" class="ref-input" id="memberPayRef" placeholder="Enter Payment Reference Code">
+                <button class="btn-submit-ref" onclick="submitPayRef()">Submit Reference Code</button>
+                <div class="modal-msg" id="memberRefMsg"></div>
 
                 <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your account will be reviewed within 30 minutes of payment.</p>
                 <button class="btn-cancel" onclick="closeModal('memberModal')">Cancel</button>
@@ -667,7 +685,7 @@
             const sel = document.getElementById('countrySelect');
             countryData.forEach(c => {
                 const opt = document.createElement('option');
-                opt.value = c.n; opt.textContent = c.n + ' (' + c.c + ')'; sel.appendChild(opt);
+                opt.value = c.n; opt.textContent = c.n; sel.appendChild(opt);
             });
         }
 
@@ -769,13 +787,51 @@
 
         function goToPayment() {
             document.getElementById('memberStep1').classList.remove('active');
+            document.getElementById('memberStep3').classList.remove('active');
             document.getElementById('memberStep2').classList.add('active');
         }
 
         function goToStep1() {
             document.getElementById('memberStep2').classList.remove('active');
+            document.getElementById('memberStep3').classList.remove('active');
             document.getElementById('memberStep1').classList.add('active');
         }
+
+        function goToMobileMoney() {
+            document.getElementById('memberStep2').classList.remove('active');
+            document.getElementById('memberStep3').classList.add('active');
+        }
+
+        /* --- Video Shuffle --- */
+        let currentVid = 0;
+        const vidIds = ['vid0', 'vid1', 'vid2'];
+        const vidLabels = ['Remote Work', 'Remote Work', 'Remote Work'];
+
+        function switchVideo(index) {
+            const prev = document.getElementById(vidIds[currentVid]);
+            if (prev) prev.classList.remove('active-video');
+            document.querySelectorAll('.vid-dot').forEach((d, i) => d.classList.toggle('active', i === index));
+            currentVid = index;
+            const next = document.getElementById(vidIds[currentVid]);
+            if (next) {
+                next.classList.add('active-video');
+                next.play().catch(() => {});
+            }
+            const lbl = document.getElementById('vidLabel');
+            if (lbl) lbl.textContent = vidLabels[currentVid];
+        }
+
+        function startVideoLoop() {
+            vidIds.forEach(id => {
+                const v = document.getElementById(id);
+                if (v) v.play().catch(() => {});
+            });
+            setInterval(() => {
+                switchVideo((currentVid + 1) % vidIds.length);
+            }, 5000);
+        }
+
+        setTimeout(startVideoLoop, 500);
 
         async function submitPayRef() {
             const ref = document.getElementById('memberPayRef').value.trim();
@@ -823,7 +879,9 @@
         function openModal(id) {
             document.getElementById(id).style.display = 'block';
             if (id === 'memberModal') {
-                goToStep1();
+                document.getElementById('memberStep1').classList.add('active');
+                document.getElementById('memberStep2').classList.remove('active');
+                document.getElementById('memberStep3').classList.remove('active');
                 document.getElementById('memberIdInput').value = '';
                 document.getElementById('memberIdMsg').style.display = 'none';
                 document.getElementById('memberIdMsg').className = 'member-id-msg';
