@@ -40,6 +40,9 @@ const uploadFields = upload.fields([
   { name: 'selfiePhoto', maxCount: 1 }
 ]);
 
+// Trust Replit's reverse proxy so req.secure works correctly
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -139,11 +142,13 @@ app.post('/api/login', async (req, res) => {
       // Create a token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
       
-      // Set as a Session Cookie (No maxAge means it expires when the tab/browser closes)
+      // Detect HTTPS (Replit always uses HTTPS via its proxy)
+      const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+      // Set as a Session Cookie (expires when the tab/browser closes)
       res.cookie('token', token, { 
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax'
       });
 
       return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html' });

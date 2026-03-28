@@ -646,7 +646,7 @@
 
         async function init() {
             try {
-                const res = await fetch('/api/user/profile');
+                const res = await fetch('/api/user/profile', { credentials: 'include' });
                 if (!res.ok) { window.location.replace('/login.html'); return; }
                 currentUser = await res.json();
                 document.getElementById('sidebarEmail').textContent = currentUser.email;
@@ -698,7 +698,7 @@
                 if (res.ok) {
                     msg.className = 'modal-msg success';
                     msg.textContent = 'Saved successfully!';
-                    const fresh = await fetch('/api/user/profile');
+                    const fresh = await fetch('/api/user/profile', { credentials: 'include' });
                     if (fresh.ok) currentUser = await fresh.json();
                     return true;
                 } else {
