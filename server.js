@@ -179,7 +179,7 @@ app.post('/api/logout', (req, res) => {
 // 5. Get current user profile (Authorization header first, then cookie fallback)
 app.get('/api/user/profile', async (req, res) => {
   try {
-    let token = req.cookies.token;
+   let token = req.headers.authorization?.split(' ')[1];
     const auth = req.headers['authorization'];
     if (auth && auth.startsWith('Bearer ')) token = auth.slice(7);
     if (!token) return res.status(401).json({ message: 'Not authenticated' });
