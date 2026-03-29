@@ -719,15 +719,16 @@ if (!token) {
                 const status = currentUser.status || 'Pending';
                 document.getElementById('statusBadge').textContent = status;
 
-                document.getElementById('fullName').value = currentUser.fullName || '';
-                document.getElementById('pNumber').value = currentUser.phoneNumber || '';
-                document.getElementById('referralCode').value = currentUser.referralCode || '';
-                if (currentUser.education) document.getElementById('eduLevel').value = currentUser.education;
-                if (currentUser.paymentMethod) document.getElementById('paymentMethod').value = currentUser.paymentMethod;
-                document.getElementById('payoutAccount').value = currentUser.payoutAccount || '';
-                document.getElementById('paymentRef').value = currentUser.paymentRef || '';
+                const _set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+                _set('fullName', currentUser.fullName);
+                _set('pNumber', currentUser.phoneNumber);
+                _set('referralCode', currentUser.referralCode);
+                _set('payoutAccount', currentUser.payoutAccount);
+                _set('paymentRef', currentUser.paymentRef);
+                if (currentUser.education) { const el = document.getElementById('eduLevel'); if (el) el.value = currentUser.education; }
+                if (currentUser.paymentMethod) { const el = document.getElementById('paymentMethod'); if (el) el.value = currentUser.paymentMethod; }
             } catch (e) {
-                window.location.replace('/login.html');
+                console.error('Dashboard init error:', e);
             }
 
             const sel = document.getElementById('countrySelect');
