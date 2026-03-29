@@ -239,8 +239,9 @@
         .btn-submit-ref:hover { opacity: 0.88; }
 
         /* --- HOME / VIDEO SECTION --- */
-        .home-header { margin-bottom: 32px; }
+        .home-header { margin-bottom: 32px; position: relative; }
         .home-header h1 { margin-bottom: 8px; }
+        .home-flag { position: absolute; top: 0; right: 0; font-size: 2rem; line-height: 1; }
 
         .section-tag {
             display: inline-block;
@@ -365,6 +366,7 @@
         <!-- HOME -->
         <div id="home" class="view-section active">
             <div class="home-header">
+                <span class="home-flag">&#x1F1FA;&#x1F1F8;</span>
                 <div class="section-tag">CloudTasks in association with WellFounds &#x1F1FA;&#x1F1F8;</div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
                 <h6>  your Go-To choice for flexible, borderless & No-TimeBound work performance</h6>
@@ -448,7 +450,7 @@
                     <i class="fa-solid fa-shield-halved" style="font-size:60px;color:#ff4d4d;margin-bottom:20px;"></i>
                     <h2 id="displayTitle">Section Restricted</h2>
                     <h3 style="color:#b0b0b0;">Membership Verification Required</h3>
-                    <p>Please verify your identity and subscribe to unlock this feature.</p>
+                    <p style="color:#FFD700;font-weight:500;">CloudTask is for Verified Members Only, Enter your Member's ID under Task Access or Apply For Membership</p>
                     <button class="btn-verify" onclick="navTo('profile', document.getElementById('profileTrigger'))">Go to Profile</button>
                 </div>
 
