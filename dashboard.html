@@ -365,7 +365,7 @@
         <!-- HOME -->
         <div id="home" class="view-section active">
             <div class="home-header">
-                <div class="section-tag">CloudTasks in association with WellFounds USA 🇺🇸</div>
+                <div class="section-tag">CloudTasks in association with WellFounds <span style="font-size:1.2em;">🇺🇸</span></div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
                 <h6>  your Go-To choice for flexible, borderless & No-TimeBound work performance</h6>
                 
@@ -618,6 +618,17 @@
                 <button class="btn-submit-ref" onclick="submitPayRef()">Submit Reference Code</button>
                 <div class="modal-msg" id="memberRefMsg"></div>
 
+                <!-- Currency Converter -->
+                <div style="background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.25);border-radius:12px;padding:14px 16px;margin-top:16px;">
+                    <p style="margin:0 0 10px;font-size:0.82rem;color:#a29bfe;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">💱 Currency Converter</p>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <select id="currencySelect" onchange="convertCurrency()" style="flex:1;background:#0d1117;border:1px solid #333;color:white;padding:10px;border-radius:8px;font-size:0.9rem;">
+                            <option value="">Select your currency</option>
+                        </select>
+                    </div>
+                    <div id="convertedResult" style="margin-top:10px;font-size:1.05rem;color:var(--success);font-weight:bold;min-height:24px;text-align:center;"></div>
+                </div>
+
                 <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your account will be reviewed and an email sent to you upon approval.</p>
                 <button class="btn-cancel" onclick="closeModal('memberModal')">Cancel</button>
             </div>
@@ -630,6 +641,11 @@
 
     <script>
         let currentUser = null;
+
+        function authHeaders() {
+            const t = localStorage.getItem('ct_token');
+            return t ? { 'Authorization': 'Bearer ' + t } : {};
+        }
 
         const countryData = [
             {n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},
@@ -690,7 +706,7 @@
 
         async function init() {
             try {
-                const res = await fetch('/api/user/profile', { credentials: 'include' });
+                const res = await fetch('/api/user/profile', { headers: authHeaders() });
                 if (!res.ok) { window.location.replace('/login.html'); return; }
                 currentUser = await res.json();
                 document.getElementById('sidebarEmail').textContent = currentUser.email;
@@ -737,12 +753,12 @@
             if (!currentUser) return false;
             data.append('email', currentUser.email);
             try {
-                const res = await fetch('/api/user/update-profile', { method: 'POST', body: data });
+                const res = await fetch('/api/user/update-profile', { method: 'POST', headers: authHeaders(), body: data });
                 const json = await res.json();
                 if (res.ok) {
                     msg.className = 'modal-msg success';
                     msg.textContent = 'Saved successfully!';
-                    const fresh = await fetch('/api/user/profile', { credentials: 'include' });
+                    const fresh = await fetch('/api/user/profile', { headers: authHeaders() });
                     if (fresh.ok) currentUser = await fresh.json();
                     return true;
                 } else {
@@ -876,9 +892,9 @@
             fd.append('paymentRef', ref);
             fd.append('email', currentUser.email);
             try {
-                const res = await fetch('/api/user/update-profile', { method: 'POST', body: fd });
+                const res = await fetch('/api/user/update-profile', { method: 'POST', headers: authHeaders(), body: fd });
                 if (res.ok) {
-                    const fresh = await fetch('/api/user/profile');
+                    const fresh = await fetch('/api/user/profile', { headers: authHeaders() });
                     if (fresh.ok) currentUser = await fresh.json();
                     msg.className = 'modal-msg success';
                     msg.textContent = 'Reference submitted! Your account will be reviewed within 30 minutes.';
@@ -892,6 +908,40 @@
                 msg.textContent = 'Network error. Please try again.';
             }
         }
+
+        /* --- Currency Converter --- */
+        let fxRates = null;
+
+        async function loadFxRates() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                const data = await res.json();
+                if (data && data.rates) {
+                    fxRates = data.rates;
+                    const sel = document.getElementById('currencySelect');
+                    const common = ['KES','UGX','TZS','NGN','ZAR','GHS','GBP','EUR','AUD','CAD','INR','PHP','BRL','MXN','JPY','CNY','AED','SAR'];
+                    const others = Object.keys(fxRates).filter(c => !common.includes(c)).sort();
+                    const all = [...common, ...others];
+                    all.forEach(code => {
+                        const opt = document.createElement('option');
+                        opt.value = code; opt.textContent = code;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (e) { /* silent — converter stays hidden if fetch fails */ }
+        }
+
+        function convertCurrency() {
+            const sel = document.getElementById('currencySelect');
+            const result = document.getElementById('convertedResult');
+            const code = sel.value;
+            if (!code || !fxRates || !fxRates[code]) { result.textContent = ''; return; }
+            const raw = 25 * fxRates[code];
+            const rounded = Math.ceil(raw);
+            result.textContent = `$25 USD ≈ ${rounded.toLocaleString()} ${code}`;
+        }
+
+        loadFxRates();
 
         /* --- Not-Active Tooltip --- */
         let tipTimeout;
