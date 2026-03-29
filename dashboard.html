@@ -478,7 +478,9 @@
         <div class="modal-content">
             <button class="modal-back" onclick="closeModal('personalModal')"><i class="fa-solid fa-arrow-left"></i></button>
             <h2>Personal Info</h2>
-            <input type="text" id="fullName" placeholder="Full Name as per ID">
+            <input type="text" id="first Name" placeholder="First Name as per ID">
+             <input type="text" id="Last Name" placeholder="Last Name as per ID">
+             <input type="text" id="National ID NO" placeholder=" Valid ID NO ">
             <select id="countrySelect" onchange="updatePrefix()">
                 <option value="">Select Country</option>
             </select>
@@ -526,7 +528,7 @@
             <label class="upload-area" id="selfieArea" for="selfie">
                 <i class="fa-solid fa-camera-retro upload-icon"></i>
                 <i class="fa-solid fa-circle-check upload-check"></i>
-                <span id="selfieLabel">Live Selfie</span>
+                <span id="selfieLabel">Clear Selfie Upload</span>
                 <input type="file" id="selfie" accept="image/*" onchange="markUploaded('selfie','selfieLabel','selfieArea')">
             </label>
             <button class="btn-update" style="margin-top:15px;" onclick="saveIdentity()">Submit Documents</button>
@@ -540,14 +542,14 @@
         <div class="modal-content">
             <button class="modal-back" onclick="closeModal('bankModal')"><i class="fa-solid fa-arrow-left"></i></button>
             <h2>Payout Details</h2>
+            <h6>NOTE: this should be the account that will receive payments for your Task earnings and Referral earnings,confirm to ensure it's accurate</h6>
             <select id="paymentMethod">
                 <option value="">Select Payment Method</option>
-                <option value="M-Pesa">M-Pesa / Mobile Money</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="PayPal">PayPal</option>
+                <option value="M-Pesa">Bank Transfer </option>
+                <option value="Bank Transfer">Mobile Money</option>
             </select>
-            <input type="text" id="payoutAccount" placeholder="Account Number / Phone">
-            <input type="text" id="paymentRef" placeholder="Payment Reference (optional)">
+            <input type="text" id="payoutAccount" placeholder="Account Number / Phone Number">
+            <input type="text" id="paymentRef" placeholder="Payment Reference Name of the card/phone number holder ">
             <button class="btn-update" style="margin-top:15px;" onclick="savePayout()">Save Details</button>
             <div class="modal-msg" id="bankMsg"></div>
             <button class="btn-cancel" onclick="closeModal('bankModal')">Cancel</button>
@@ -562,7 +564,7 @@
             <div class="member-step active" id="memberStep1">
                 <button class="modal-back" onclick="closeModal('memberModal')"><i class="fa-solid fa-arrow-left"></i></button>
                 <h2>Task / Member Access</h2>
-                <p style="color:#b0b0b0;font-size:0.9rem;margin-bottom:16px;">If you have an existing Membership ID, enter it below to check your access.</p>
+                <p style="color:#b0b0b0;font-size:0.9rem;margin-bottom:16px;">If you have an existing Membership ID, enter it below to get Redirected to Tasks.</p>
                 <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
                     <input type="text" id="memberIdInput" placeholder="Enter Membership ID" oninput="checkMemberId()" style="flex:1;margin:0;">
                     <button onclick="checkMemberId()" style="background:var(--primary);border:none;color:white;width:46px;height:46px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
@@ -571,7 +573,7 @@
                 </div>
                 <div class="member-id-msg" id="memberIdMsg"></div>
                 <div style="margin-top:24px;border-top:1px solid #333;padding-top:20px;">
-                    <p style="color:#b0b0b0;font-size:0.88rem;margin-top:0;">Don't have a Membership ID yet? Apply below to gain full access to tasks and projects.</p>
+                    <p style="color:#b0b0b0;font-size:0.88rem;margin-top:0;">Don't have a Membership ID yet? Apply below to be Verified for full access to tasks and projects.</p>
                     <button class="btn-update" onclick="goToPayment()">Apply For Membership</button>
                 </div>
                 <button class="btn-cancel" onclick="closeModal('memberModal')" style="margin-top:10px;">Cancel</button>
@@ -603,8 +605,8 @@
             <!-- Step 3: Pay via CloudTask (Mobile Money) -->
             <div class="member-step" id="memberStep3">
                 <button class="modal-back" onclick="goToPayment()"><i class="fa-solid fa-arrow-left"></i></button>
-                <h2 style="padding-left:36px;">Pay via CloudTask</h2>
-                <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:16px;">Send <strong style="color:white;">$25</strong> to the CloudTask local merchant using the details below, then enter your reference code.</p>
+                <h2 style="padding-left:36px;">Pay via CloudTask Regional Merchant</h2>
+                <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:16px;">Fund <strong style="color:white;">$25</strong> to the CloudTask local merchant using the details below, then enter your reference code for confirmation.</p>
 
                 <div class="payment-box" style="margin-bottom:20px;">
                     <p style="margin-top:0;font-size:0.8rem;color:#888;text-transform:uppercase;letter-spacing:1px;">CloudTask Local Merchant</p>
@@ -616,7 +618,7 @@
                 <button class="btn-submit-ref" onclick="submitPayRef()">Submit Reference Code</button>
                 <div class="modal-msg" id="memberRefMsg"></div>
 
-                <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your account will be reviewed within 30 minutes of payment.</p>
+                <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your account will be reviewed and an email sent to you upon approval.</p>
                 <button class="btn-cancel" onclick="closeModal('memberModal')">Cancel</button>
             </div>
 
