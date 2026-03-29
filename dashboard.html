@@ -239,9 +239,8 @@
         .btn-submit-ref:hover { opacity: 0.88; }
 
         /* --- HOME / VIDEO SECTION --- */
-        .home-header { margin-bottom: 32px; position: relative; }
+        .home-header { margin-bottom: 32px; }
         .home-header h1 { margin-bottom: 8px; }
-        .home-flag { position: absolute; top: 0; right: 0; font-size: 2rem; line-height: 1; }
 
         .section-tag {
             display: inline-block;
@@ -366,7 +365,6 @@
         <!-- HOME -->
         <div id="home" class="view-section active">
             <div class="home-header">
-                <img class="home-flag" src="https://flagcdn.com/48x36/us.png" alt="USA" width="48" height="36">
                 <div class="section-tag">CloudTasks in association with WellFounds <img src="https://flagcdn.com/24x18/us.png" alt="USA" style="vertical-align:middle;margin-left:4px;border-radius:2px;"></div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
                 <h6>  your Go-To choice for flexible, borderless & No-TimeBound work performance</h6>
@@ -417,7 +415,7 @@
                 <div class="glass-card">
                     <div class="number-tag">03</div>
                     <div class="card-icon"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <h3>Identity Verification</h3>
+                    <h3>Identity Verification <span id="idSubmittedBadge" style="display:none;align-items:center;gap:4px;background:rgba(0,255,163,0.15);border:1px solid #00ffa3;color:#00ffa3;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:20px;vertical-align:middle;"><i class="fa-solid fa-circle-check"></i> Submitted</span></h3>
                     <p>Secure account with official document logs.</p>
                     <button class="btn-update" onclick="openModal('idModal')">VERIFY IDENTITY</button>
                 </div>
@@ -721,13 +719,21 @@ if (!token) {
                 document.getElementById('statusBadge').textContent = status;
 
                 const _set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-                _set('fullName', currentUser.fullName);
+                if (currentUser.fullName) {
+                    const parts = currentUser.fullName.trim().split(' ');
+                    _set('firstName', parts[0] || '');
+                    _set('lastName', parts.slice(1).join(' ') || '');
+                }
                 _set('pNumber', currentUser.phoneNumber);
                 _set('referralCode', currentUser.referralCode);
                 _set('payoutAccount', currentUser.payoutAccount);
-                _set('paymentRef', currentUser.paymentRef);
                 if (currentUser.education) { const el = document.getElementById('eduLevel'); if (el) el.value = currentUser.education; }
                 if (currentUser.paymentMethod) { const el = document.getElementById('paymentMethod'); if (el) el.value = currentUser.paymentMethod; }
+
+                if (currentUser.idPhotoPath || currentUser.selfiePath) {
+                    const idCard = document.getElementById('idSubmittedBadge');
+                    if (idCard) idCard.style.display = 'inline-flex';
+                }
             } catch (e) {
                 console.error('Dashboard init error:', e);
             }
@@ -812,7 +818,11 @@ if (!token) {
                 msg.textContent = 'Please select at least one file to upload.';
                 return;
             }
-            await postFormData(fd, 'idMsg');
+            const ok = await postFormData(fd, 'idMsg');
+            if (ok) {
+                const badge = document.getElementById('idSubmittedBadge');
+                if (badge) badge.style.display = 'inline-flex';
+            }
         }
 
         async function savePayout() {
