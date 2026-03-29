@@ -158,7 +158,11 @@ app.post('/api/login', async (req, res) => {
         sameSite: isSecure ? 'none' : 'lax'
       });
 
-      return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html', token });
+return res.status(200).json({ 
+    success: true, 
+    token: token, 
+    redirect: '/dashboard.html' 
+}); 
     }
     res.status(401).json({ message: "Invalid email or password" });
   } catch (error) {
