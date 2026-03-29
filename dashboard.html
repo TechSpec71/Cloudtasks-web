@@ -648,27 +648,6 @@ if (!token) {
     window.location.href = 'login.html';
 }
 
-// 2. Fetch profile using the helper function you already have
-async function initializeDashboard() {
-    try {
-        const res = await fetch('/api/profile', {
-            headers: authHeaders() // This uses your existing function!
-        });
-        
-        if (!res.ok) throw new Error("Session expired");
-        
-        const data = await res.json();
-        currentUser = data.user;
-        // ... (any other setup code you have)
-    } catch (err) {
-        console.error(err);
-        localStorage.removeItem('ct_token'); // Clear bad token
-        window.location.href = 'login.html';
-    }
-}
-
-// Run the initialization
-initializeDashboard();
         function authHeaders() {
             const t = localStorage.getItem('ct_token');
             return t ? { 'Authorization': 'Bearer ' + t } : {};
