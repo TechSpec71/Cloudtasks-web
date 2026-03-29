@@ -51,12 +51,12 @@
             <table id="adminTable" style="display:none;">
                 <thead>
                     <tr>
-                        <th>Name / Phone</th>
+                        <th>Full Name</th>
                         <th>Email</th>
                         <th>Referral Code</th>
-                        <th>Education</th>
                         <th>ID Doc</th>
                         <th>Live Selfie</th>
+                        <th>Payout Number</th>
                         <th>Payment Code</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -114,20 +114,21 @@
                     
                     users.forEach(u => {
                         const displayName = u.fullName || "Not Set";
-                        const displayPhone = u.phoneNumber || "";
-                        const referral = u.referralCode || "N/A";
+                        const displayPhone = u.phoneNumber ? `<br><small>${u.phoneNumber}</small>` : "";
+                        const referral = u.referralCode || "---";
                         const idLink = u.idPhotoPath ? `<a href="${u.idPhotoPath}" target="_blank" class="id-link">View ID</a>` : "---";
                         const selfieLink = u.selfiePath ? `<a href="${u.selfiePath}" target="_blank" class="selfie-link">View Selfie</a>` : "---";
+                        const payoutNum = u.payoutAccount ? `<span style="color:#a29bfe;font-family:monospace;">${u.payoutAccount}</span>` : "---";
                         const payCode = u.paymentRef ? `<span class="pay-code">${u.paymentRef}</span>` : "---";
 
                         list.innerHTML += `
                             <tr>
-                                <td><strong>${displayName}</strong><br><small>${displayPhone}</small></td>
+                                <td><strong>${displayName}</strong>${displayPhone}</td>
                                 <td>${u.email}</td>
                                 <td>${referral}</td>
-                                <td>${u.education || 'N/A'}</td>
                                 <td>${idLink}</td>
                                 <td>${selfieLink}</td>
+                                <td>${payoutNum}</td>
                                 <td>${payCode}</td>
                                 <td>${u.status || 'Pending'}</td>
                                 <td>

@@ -365,7 +365,7 @@
         <!-- HOME -->
         <div id="home" class="view-section active">
             <div class="home-header">
-                <div class="section-tag">CloudTasks in association with WellFounds <span style="font-size:1.2em;">🇺🇸</span></div>
+                <div class="section-tag">CloudTasks in association with WellFounds &#x1F1FA;&#x1F1F8;</div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
                 <h6>  your Go-To choice for flexible, borderless & No-TimeBound work performance</h6>
                 
@@ -478,9 +478,9 @@
         <div class="modal-content">
             <button class="modal-back" onclick="closeModal('personalModal')"><i class="fa-solid fa-arrow-left"></i></button>
             <h2>Personal Info</h2>
-            <input type="text" id="first Name" placeholder="First Name as per ID">
-             <input type="text" id="Last Name" placeholder="Last Name as per ID">
-             <input type="text" id="National ID NO" placeholder=" Valid ID NO ">
+            <input type="text" id="firstName" placeholder="First Name as per ID">
+            <input type="text" id="lastName" placeholder="Last Name as per ID">
+            <input type="text" id="nationalIdNo" placeholder="Valid ID No.">
             <select id="countrySelect" onchange="updatePrefix()">
                 <option value="">Select Country</option>
             </select>
@@ -545,11 +545,10 @@
             <h6>NOTE: this should be the account that will receive payments for your Task earnings and Referral earnings,confirm to ensure it's accurate</h6>
             <select id="paymentMethod">
                 <option value="">Select Payment Method</option>
-                <option value="M-Pesa">Bank Transfer </option>
-                <option value="Bank Transfer">Mobile Money</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Mobile Money">Mobile Money</option>
             </select>
             <input type="text" id="payoutAccount" placeholder="Account Number / Phone Number">
-            <input type="text" id="paymentRef" placeholder="Payment Reference Name of the card/phone number holder ">
             <button class="btn-update" style="margin-top:15px;" onclick="savePayout()">Save Details</button>
             <div class="modal-msg" id="bankMsg"></div>
             <button class="btn-cancel" onclick="closeModal('bankModal')">Cancel</button>
@@ -782,7 +781,10 @@ if (!token) {
 
         async function savePersonal() {
             const fd = new FormData();
-            fd.append('fullName', document.getElementById('fullName').value.trim());
+            const first = document.getElementById('firstName').value.trim();
+            const last = document.getElementById('lastName').value.trim();
+            fd.append('fullName', (first + ' ' + last).trim());
+            fd.append('nationalIdNo', document.getElementById('nationalIdNo').value.trim());
             const prefix = document.getElementById('phonePrefix').value;
             const num = document.getElementById('pNumber').value.trim();
             fd.append('phoneNumber', prefix ? prefix + num : num);
@@ -815,7 +817,6 @@ if (!token) {
             const fd = new FormData();
             fd.append('paymentMethod', document.getElementById('paymentMethod').value);
             fd.append('payoutAccount', document.getElementById('payoutAccount').value.trim());
-            fd.append('paymentRef', document.getElementById('paymentRef').value.trim());
             await postFormData(fd, 'bankMsg');
         }
 
@@ -904,8 +905,11 @@ if (!token) {
                     const fresh = await fetch('/api/user/profile', { headers: authHeaders() });
                     if (fresh.ok) currentUser = await fresh.json();
                     msg.className = 'modal-msg success';
-                    msg.textContent = 'Reference submitted! Your account will be reviewed within 30 minutes.';
+                    msg.textContent = 'Reference submitted! Await Approval.';
                     document.getElementById('memberPayRef').value = '';
+                } else if (res.status === 409) {
+                    msg.className = 'modal-msg error';
+                    msg.textContent = 'Code Rejected! This reference code has already been used by another account.';
                 } else {
                     msg.className = 'modal-msg error';
                     msg.textContent = 'Failed to submit. Please try again.';
