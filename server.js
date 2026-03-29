@@ -158,7 +158,7 @@ app.post('/api/login', async (req, res) => {
         sameSite: isSecure ? 'none' : 'lax'
       });
 
-      return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html' });
+      return res.status(200).json({ message: "Login successful", redirect: '/dashboard.html', token });
     }
     res.status(401).json({ message: "Invalid email or password" });
   } catch (error) {
@@ -172,10 +172,12 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'Logged out' });
 });
 
-// 5. Get current user profile (reads JWT from cookie)
+// 5. Get current user profile (Authorization header first, then cookie fallback)
 app.get('/api/user/profile', async (req, res) => {
   try {
-    const token = req.cookies.token;
+    let token = req.cookies.token;
+    const auth = req.headers['authorization'];
+    if (auth && auth.startsWith('Bearer ')) token = auth.slice(7);
     if (!token) return res.status(401).json({ message: 'Not authenticated' });
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.userId).select('-password');

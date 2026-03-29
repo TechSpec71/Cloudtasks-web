@@ -139,6 +139,7 @@
 
         const data = await res.json();
         if(res.ok) {
+            if (data.token) localStorage.setItem('ct_token', data.token);
             window.location.href = data.redirect || '/dashboard.html';
         } else {
             alert(data.message || "Invalid email or password.");
