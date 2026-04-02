@@ -60,7 +60,7 @@
         }
 
         /* Home page top navigation bar */
-        .home-nav { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+        .home-nav { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; justify-content: flex-end; }
         .home-nav-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #e0e0e0; padding: 10px 22px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: 0.2s; letter-spacing: 0.3px; }
         .home-nav-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
 
@@ -1133,39 +1133,56 @@ if (!token) {
         let tipTimeout;
         function showNotActive(e) {
             const tip = document.getElementById('notActiveTip');
-            const rect = e.currentTarget.getBoundingClientRect();
             tip.style.display = 'block';
-            tip.style.top = (rect.top - 38 + window.scrollY) + 'px';
-            tip.style.left = (rect.left + rect.width / 2 - tip.offsetWidth / 2) + 'px';
+            const rect = e.currentTarget.getBoundingClientRect();
+            const tipW = tip.offsetWidth || 180;
+            const tipH = tip.offsetHeight || 34;
+            let top = rect.top - tipH - 6;
+            let left = rect.left + rect.width / 2 - tipW / 2;
+            if (top < 6) top = rect.bottom + 6;
+            if (left < 6) left = 6;
+            if (left + tipW > window.innerWidth - 6) left = window.innerWidth - tipW - 6;
+            tip.style.top = top + 'px';
+            tip.style.left = left + 'px';
             clearTimeout(tipTimeout);
             tipTimeout = setTimeout(() => { tip.style.display = 'none'; }, 2500);
         }
 
         function profileStepDone(step) {
             if (!currentUser) return false;
-            if (step === 1) {
-                return !!(currentUser.fullName && currentUser.fullName.trim() && currentUser.phoneNumber && currentUser.phoneNumber.trim());
-            }
+            if (step === 1) return !!(currentUser.fullName && currentUser.fullName.trim() && currentUser.phoneNumber && currentUser.phoneNumber.trim());
             if (step === 2) return !!(currentUser.education && currentUser.education.trim());
             if (step === 3) return !!(currentUser.idPhotoPath || currentUser.selfiePath);
+            if (step === 4) return !!(currentUser.payoutAccount && currentUser.payoutAccount.trim());
             return true;
         }
 
         function profileStepMsg(step) {
-            const msgs = ['', 'Please complete your Personal Info first.', 'Please complete your Education Info first.', 'Please upload your ID documents first.'];
+            const msgs = ['', 'Please complete your Personal Info first.', 'Please complete your Education Info first.', 'Please upload your ID & Selfie first.', 'Please set up your Payout Details first.'];
             return msgs[step] || '';
         }
 
+        function showStepToast(msg) {
+            const msgBox = document.createElement('div');
+            msgBox.style.cssText = 'position:fixed;top:22px;left:50%;transform:translateX(-50%);background:#3a1c71;border:1px solid var(--primary);color:#fff;padding:12px 26px;border-radius:10px;z-index:9999;font-size:0.88rem;box-shadow:0 4px 20px rgba(0,0,0,0.5);text-align:center;max-width:90vw;';
+            msgBox.textContent = msg;
+            document.body.appendChild(msgBox);
+            setTimeout(() => msgBox.remove(), 2800);
+        }
+
+        function allProfileStepsDone() {
+            for (let s = 1; s <= 4; s++) {
+                if (!profileStepDone(s)) return { done: false, step: s };
+            }
+            return { done: true };
+        }
+
         function openModal(id) {
-            const order = { eduModal: 1, idModal: 2, bankModal: 3 };
+            const order = { eduModal: 1, idModal: 2, bankModal: 3, memberModal: 4 };
             if (order[id] !== undefined) {
                 for (let s = 1; s <= order[id]; s++) {
                     if (!profileStepDone(s)) {
-                        const msgBox = document.createElement('div');
-                        msgBox.style.cssText = 'position:fixed;top:22px;left:50%;transform:translateX(-50%);background:#3a1c71;border:1px solid var(--primary);color:#fff;padding:12px 22px;border-radius:10px;z-index:9999;font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
-                        msgBox.textContent = profileStepMsg(s);
-                        document.body.appendChild(msgBox);
-                        setTimeout(() => msgBox.remove(), 2800);
+                        showStepToast(profileStepMsg(s));
                         return;
                     }
                 }
@@ -1453,6 +1470,12 @@ if (!token) {
 
         function openMembershipFromTask() {
             closeModal('taskApplyModal');
+            const check = allProfileStepsDone();
+            if (!check.done) {
+                navTo('profile', document.getElementById('profileTrigger'));
+                setTimeout(() => showStepToast(profileStepMsg(check.step)), 350);
+                return;
+            }
             navTo('profile', document.getElementById('profileTrigger'));
             setTimeout(() => openModal('memberModal'), 300);
         }

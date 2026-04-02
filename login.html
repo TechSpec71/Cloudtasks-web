@@ -102,6 +102,11 @@
             text-decoration: none;
             font-size: 0.9rem;
         }
+        .back-link .reg-word {
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +124,7 @@
         <input type="email" id="loginEmail" placeholder="Email Address">
         <input type="password" id="loginPass" placeholder="Password">
         <button onclick="handleLogin()">Login</button>
-        <a href="index.html" class="back-link">Don't have an account? Register</a>
+        <a href="index.html" class="back-link">Don't have an account? <span class="reg-word">Register</span></a>
     </div>
 </div>
 
