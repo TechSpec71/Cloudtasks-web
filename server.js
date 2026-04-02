@@ -67,6 +67,7 @@ const userSchema = new mongoose.Schema({
   paymentMethod: { type: String, default: "" },  
   payoutAccount: { type: String, default: "" },  
   paymentRef: { type: String, default: "" },     
+  uiaCode: { type: String, default: "" },
   isVerified: { type: Boolean, default: false },
   status: { type: String, default: 'Pending' },
   createdAt: { type: Date, default: Date.now }
@@ -209,6 +210,20 @@ app.post('/api/admin/update-status', async (req, res) => {
     res.json({ message: `User marked as ${status}` });
   } catch (error) {
     res.status(500).json({ message: "Update failed" });
+  }
+});
+
+app.post('/api/admin/set-uia', async (req, res) => {
+  try {
+    const { email, uiaCode } = req.body;
+    if (!uiaCode || !uiaCode.trim()) return res.status(400).json({ message: "UIA code is required" });
+    const trimmed = uiaCode.trim().toUpperCase();
+    const existing = await User.findOne({ uiaCode: trimmed, email: { $ne: email } });
+    if (existing) return res.status(409).json({ message: "UIA code already assigned to another user" });
+    await User.findOneAndUpdate({ email }, { uiaCode: trimmed });
+    res.json({ message: "UIA code assigned successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to assign UIA code" });
   }
 });
 

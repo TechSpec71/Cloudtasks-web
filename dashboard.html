@@ -48,7 +48,7 @@
         .hamburger {
             display: none;
             position: fixed;
-            top: 16px; left: 16px;
+            top: 16px; right: 16px; left: auto;
             z-index: 200;
             background: var(--primary);
             border: none; color: white;
@@ -58,6 +58,33 @@
             cursor: pointer;
             align-items: center; justify-content: center;
         }
+
+        /* UIA code badge in sidebar */
+        .sidebar-uia { font-size: 12px; color: #a29bfe; font-family: monospace; font-weight: bold; margin-bottom: 20px; display: none; letter-spacing: 1px; }
+        .sidebar-uia span { background: rgba(124,77,255,0.2); border: 1px solid var(--primary); border-radius: 6px; padding: 3px 8px; }
+
+        /* Task cards */
+        .tasks-section { margin-top: 32px; }
+        .tasks-search { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tasks-search input { flex: 1; padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem; outline: none; }
+        .tasks-search input::placeholder { color: #666; }
+        .tasks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .task-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 10px; transition: 0.25s; }
+        .task-card:hover { border-color: var(--primary); background: rgba(124,77,255,0.08); }
+        .task-date { font-size: 11px; color: #666; }
+        .task-title { font-size: 16px; font-weight: 400; color: #fff; line-height: 1.4; }
+        .task-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+        .task-skill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 3px 9px; font-size: 11px; color: #b0b0b0; }
+        .task-pay { font-size: 13px; color: var(--success); font-weight: 600; margin-top: 4px; }
+        .btn-apply { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 13px; width: 100%; transition: 0.2s; margin-top: auto; }
+        .btn-apply:hover { background: rgba(255,255,255,0.12); }
+        .tasks-empty { color: #666; text-align: center; padding: 40px; grid-column: 1/-1; }
+
+        /* Home footer */
+        .home-footer { margin-top: 48px; padding: 28px 0 12px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; }
+        .home-footer-brand { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+        .home-footer-brand i { color: var(--primary); font-size: 22px; }
+        .home-footer-copy { font-size: 12px; color: #555; }
         .sidebar-overlay {
             display: none;
             position: fixed; inset: 0;
@@ -330,12 +357,14 @@
             .lock-card { padding: 24px 16px; }
 
             .video-hero { height: calc(100vh - 200px); border-radius: 12px; }
+            .tasks-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
             .main-content { padding: 16px 10px; padding-top: 68px; }
             .glass-card h3 { font-size: 15px; }
             .other-pay-grid { grid-template-columns: repeat(2, 1fr); }
+            .tasks-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -348,6 +377,7 @@
     <div class="sidebar" id="sidebar">
         <div class="logo"><i class="fa-solid fa-cloud"></i><span>CloudTasks</span></div>
         <div class="sidebar-email" id="sidebarEmail">Loading...</div>
+        <div class="sidebar-uia" id="sidebarUia">UIA: <span id="sidebarUiaCode">—</span></div>
 
         <div class="nav-item active" onclick="navTo('home', this); closeSidebar()"><i class="fa-solid fa-house"></i> Home Page</div>
         <div id="profileTrigger" class="nav-item" onclick="navTo('profile', this); closeSidebar()"><i class="fa-solid fa-user-circle"></i> User Profile</div>
@@ -386,6 +416,46 @@
                     <div class="vid-dot active" onclick="switchVideo(0)"></div>
                     <div class="vid-dot" onclick="switchVideo(1)"></div>
                     <div class="vid-dot" onclick="switchVideo(2)"></div>
+                </div>
+            </div>
+
+            <!-- TASKS SECTION -->
+            <div class="tasks-section">
+                <h2 style="margin-bottom:6px;font-weight:600;">Available Remote Roles</h2>
+                <p style="color:#666;font-size:13px;margin-bottom:16px;">Browse 150+ remote opportunities — verified members get full access.</p>
+                <div class="tasks-search">
+                    <input type="text" id="taskSearchInput" placeholder="&#x1F50D;  Search tasks, skills, or roles..." oninput="renderTasks()">
+                </div>
+                <div class="tasks-grid" id="tasksGrid"></div>
+            </div>
+
+            <!-- HOME FOOTER -->
+            <div class="home-footer">
+                <div class="home-footer-brand"><i class="fa-solid fa-cloud"></i> CloudTasks</div>
+                <div class="home-footer-copy">&copy; 2025 CloudTasks. All Rights Reserved.</div>
+            </div>
+        </div>
+
+        <!-- MODAL: Task Apply -->
+        <div id="taskApplyModal" class="modal">
+            <div class="modal-content" style="max-width:440px;">
+                <button class="modal-back" onclick="closeModal('taskApplyModal')"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 id="taskApplyTitle" style="padding-left:36px;font-size:1.1rem;"></h2>
+
+                <!-- Option A: Enter membership ID -->
+                <div id="taskApplyStep1">
+                    <p style="color:#b0b0b0;font-size:0.88rem;margin-bottom:14px;">Choose how you'd like to proceed:</p>
+                    <p style="font-weight:600;margin-bottom:6px;font-size:0.9rem;">Option 1 — Enter your Membership ID</p>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="taskMemberIdInput" placeholder="Enter Membership ID" style="flex:1;margin:0;">
+                        <button onclick="checkTaskMemberId()" style="background:var(--primary);border:none;color:white;width:46px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="modal-msg" id="taskMemberIdMsg" style="margin-top:8px;"></div>
+                    <div style="text-align:center;color:#555;margin:16px 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:1px;">— or —</div>
+                    <p style="font-weight:600;margin-bottom:10px;font-size:0.9rem;">Option 2 — Apply for Membership</p>
+                    <button class="btn-update" onclick="openMembershipFromTask()">Apply For Membership</button>
                 </div>
             </div>
         </div>
@@ -734,6 +804,15 @@ if (!token) {
                     const idCard = document.getElementById('idSubmittedBadge');
                     if (idCard) idCard.style.display = 'inline-flex';
                 }
+
+                if (currentUser.uiaCode) {
+                    const uiaWrap = document.getElementById('sidebarUia');
+                    const uiaCode = document.getElementById('sidebarUiaCode');
+                    if (uiaWrap && uiaCode) {
+                        uiaCode.textContent = currentUser.uiaCode;
+                        uiaWrap.style.display = 'block';
+                    }
+                }
             } catch (e) {
                 console.error('Dashboard init error:', e);
             }
@@ -978,7 +1057,35 @@ if (!token) {
             tipTimeout = setTimeout(() => { tip.style.display = 'none'; }, 2500);
         }
 
+        function profileStepDone(step) {
+            if (!currentUser) return false;
+            if (step === 1) {
+                return !!(currentUser.fullName && currentUser.fullName.trim() && currentUser.phoneNumber && currentUser.nationalIdNo);
+            }
+            if (step === 2) return !!currentUser.education;
+            if (step === 3) return !!(currentUser.idPhotoPath || currentUser.selfiePath);
+            return true;
+        }
+
+        function profileStepMsg(step) {
+            const msgs = ['', 'Please complete your Personal Info first.', 'Please complete your Education Info first.', 'Please upload your ID documents first.'];
+            return msgs[step] || '';
+        }
+
         function openModal(id) {
+            const order = { eduModal: 1, idModal: 2, bankModal: 3 };
+            if (order[id] !== undefined) {
+                for (let s = 1; s <= order[id]; s++) {
+                    if (!profileStepDone(s)) {
+                        const msgBox = document.createElement('div');
+                        msgBox.style.cssText = 'position:fixed;top:22px;left:50%;transform:translateX(-50%);background:#3a1c71;border:1px solid var(--primary);color:#fff;padding:12px 22px;border-radius:10px;z-index:9999;font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+                        msgBox.textContent = profileStepMsg(s);
+                        document.body.appendChild(msgBox);
+                        setTimeout(() => msgBox.remove(), 2800);
+                        return;
+                    }
+                }
+            }
             document.getElementById(id).style.display = 'block';
             if (id === 'memberModal') {
                 document.getElementById('memberStep1').classList.add('active');
@@ -1052,6 +1159,215 @@ if (!token) {
         window.onclick = function(e) {
             if (e.target.classList.contains('modal')) e.target.style.display = 'none';
         };
+
+        /* --- Task Cards --- */
+        const TASK_DATA = [
+            {title:"Virtual Assistant for E-Commerce Brand",skills:["Admin","Communication","Shopify"],pay:"$18–$25/hr",posted:"Mar 30, 2025"},
+            {title:"Data Entry & CRM Management",skills:["Data Entry","Excel","HubSpot"],pay:"$14–$20/hr",posted:"Apr 01, 2025"},
+            {title:"Social Media Manager – Instagram & TikTok",skills:["Social Media","Canva","Copywriting"],pay:"$20–$30/hr",posted:"Mar 28, 2025"},
+            {title:"Remote Customer Support Agent",skills:["Customer Service","Zendesk","Email"],pay:"$15–$22/hr",posted:"Apr 01, 2025"},
+            {title:"Content Writer – Tech & SaaS Niche",skills:["Writing","SEO","Research"],pay:"$25–$40/hr",posted:"Mar 31, 2025"},
+            {title:"Bookkeeping & Accounts Payable",skills:["Accounting","QuickBooks","Excel"],pay:"$20–$35/hr",posted:"Mar 29, 2025"},
+            {title:"SEO Specialist – On-Page & Off-Page",skills:["SEO","Ahrefs","Content"],pay:"$22–$38/hr",posted:"Mar 27, 2025"},
+            {title:"Graphic Designer for Marketing Collateral",skills:["Photoshop","Illustrator","Branding"],pay:"$25–$45/hr",posted:"Mar 30, 2025"},
+            {title:"Email Marketing Specialist",skills:["Mailchimp","Copywriting","Automation"],pay:"$20–$35/hr",posted:"Apr 01, 2025"},
+            {title:"WordPress Website Manager",skills:["WordPress","CSS","Plugins"],pay:"$18–$30/hr",posted:"Mar 26, 2025"},
+            {title:"Project Coordinator – Digital Agency",skills:["Project Management","Asana","Slack"],pay:"$22–$38/hr",posted:"Mar 25, 2025"},
+            {title:"Video Editor – YouTube & Reels",skills:["Premiere Pro","CapCut","Color Grading"],pay:"$20–$40/hr",posted:"Mar 24, 2025"},
+            {title:"Lead Generation Specialist",skills:["LinkedIn","Apollo","Outreach"],pay:"$18–$28/hr",posted:"Mar 23, 2025"},
+            {title:"Cold Email Copywriter",skills:["Copywriting","Email","B2B"],pay:"$22–$40/hr",posted:"Mar 31, 2025"},
+            {title:"Executive Virtual Assistant",skills:["Admin","Calendar","Communication"],pay:"$25–$45/hr",posted:"Apr 01, 2025"},
+            {title:"UX Researcher – Remote Usability Testing",skills:["User Research","Figma","Survey"],pay:"$28–$50/hr",posted:"Mar 28, 2025"},
+            {title:"Podcast Manager & Editor",skills:["Audacity","Show Notes","Scheduling"],pay:"$20–$35/hr",posted:"Mar 27, 2025"},
+            {title:"E-Commerce Product Lister",skills:["eBay","Amazon","Data Entry"],pay:"$14–$22/hr",posted:"Mar 26, 2025"},
+            {title:"Online Community Manager",skills:["Discord","Facebook Groups","Moderation"],pay:"$18–$28/hr",posted:"Mar 25, 2025"},
+            {title:"Tech Support Specialist",skills:["Troubleshooting","Zendesk","Remote Tools"],pay:"$20–$32/hr",posted:"Apr 01, 2025"},
+            {title:"Shopify Store Manager",skills:["Shopify","E-Commerce","Email"],pay:"$22–$40/hr",posted:"Mar 30, 2025"},
+            {title:"Pinterest Marketing Manager",skills:["Pinterest","Tailwind","SEO"],pay:"$18–$30/hr",posted:"Mar 29, 2025"},
+            {title:"Transcription Specialist",skills:["Transcription","Listening","MS Word"],pay:"$12–$20/hr",posted:"Mar 28, 2025"},
+            {title:"Grant Writer – Nonprofit Sector",skills:["Writing","Research","Fundraising"],pay:"$30–$55/hr",posted:"Mar 27, 2025"},
+            {title:"Social Media Ads Manager",skills:["Facebook Ads","Meta","Analytics"],pay:"$25–$45/hr",posted:"Mar 26, 2025"},
+            {title:"Research Assistant – Legal & Compliance",skills:["Legal Research","MS Word","Analysis"],pay:"$22–$38/hr",posted:"Apr 01, 2025"},
+            {title:"Remote Recruiter – Tech Roles",skills:["Recruiting","LinkedIn","ATS"],pay:"$25–$45/hr",posted:"Mar 31, 2025"},
+            {title:"Dropshipping Store Operator",skills:["Shopify","Dropshipping","Product Research"],pay:"$18–$32/hr",posted:"Mar 30, 2025"},
+            {title:"AI Prompt Engineer",skills:["ChatGPT","Prompt Engineering","Python"],pay:"$30–$60/hr",posted:"Mar 29, 2025"},
+            {title:"Online Tutor – Mathematics",skills:["Teaching","Math","Zoom"],pay:"$20–$40/hr",posted:"Mar 28, 2025"},
+            {title:"Blog Manager & Strategist",skills:["WordPress","SEO","Editorial"],pay:"$22–$38/hr",posted:"Mar 27, 2025"},
+            {title:"Affiliate Marketing Manager",skills:["Affiliate","Analytics","Email"],pay:"$25–$45/hr",posted:"Mar 26, 2025"},
+            {title:"Online Tutor – English Language",skills:["Teaching","ESL","Zoom"],pay:"$18–$35/hr",posted:"Apr 01, 2025"},
+            {title:"Instagram Growth Strategist",skills:["Instagram","Reels","Analytics"],pay:"$20–$35/hr",posted:"Mar 31, 2025"},
+            {title:"Human Resources Assistant",skills:["HR","Recruitment","Documentation"],pay:"$18–$30/hr",posted:"Mar 30, 2025"},
+            {title:"Web Research Analyst",skills:["Research","Google","Excel"],pay:"$15–$25/hr",posted:"Mar 29, 2025"},
+            {title:"Customer Onboarding Specialist",skills:["CRM","Communication","SaaS"],pay:"$20–$35/hr",posted:"Mar 28, 2025"},
+            {title:"Business Development Representative",skills:["Sales","Cold Calling","CRM"],pay:"$25–$50/hr",posted:"Mar 27, 2025"},
+            {title:"Product Description Writer",skills:["Copywriting","E-Commerce","SEO"],pay:"$18–$32/hr",posted:"Mar 26, 2025"},
+            {title:"LinkedIn Content Creator",skills:["LinkedIn","Writing","Personal Brand"],pay:"$22–$40/hr",posted:"Apr 01, 2025"},
+            {title:"Remote Sales Development Rep",skills:["Sales","Outreach","CRM"],pay:"$22–$45/hr",posted:"Mar 31, 2025"},
+            {title:"Chat Support Agent – SaaS",skills:["Live Chat","SaaS","Communication"],pay:"$15–$22/hr",posted:"Mar 30, 2025"},
+            {title:"Financial Analyst – Budgeting & Forecasting",skills:["Excel","Finance","Forecasting"],pay:"$30–$55/hr",posted:"Mar 29, 2025"},
+            {title:"Digital Marketing Assistant",skills:["Marketing","Social Media","Analytics"],pay:"$18–$30/hr",posted:"Mar 28, 2025"},
+            {title:"Notion Systems Builder",skills:["Notion","Productivity","Templates"],pay:"$20–$40/hr",posted:"Mar 27, 2025"},
+            {title:"Remote Account Manager",skills:["Account Management","CRM","Communication"],pay:"$25–$45/hr",posted:"Mar 26, 2025"},
+            {title:"YouTube Channel Manager",skills:["YouTube","SEO","Analytics"],pay:"$20–$35/hr",posted:"Apr 01, 2025"},
+            {title:"Translation Services – Spanish/English",skills:["Translation","Spanish","English"],pay:"$20–$38/hr",posted:"Mar 31, 2025"},
+            {title:"Email Inbox Manager",skills:["Admin","Email","Organization"],pay:"$14–$22/hr",posted:"Mar 30, 2025"},
+            {title:"Recruitment Coordinator",skills:["HR","Scheduling","ATS"],pay:"$20–$35/hr",posted:"Mar 29, 2025"},
+            {title:"PR & Media Outreach Specialist",skills:["PR","Pitching","Journalism"],pay:"$25–$45/hr",posted:"Mar 28, 2025"},
+            {title:"Tech Blog Writer",skills:["Writing","Technology","SEO"],pay:"$22–$40/hr",posted:"Mar 27, 2025"},
+            {title:"E-Learning Course Creator",skills:["Instructional Design","Video","LMS"],pay:"$28–$55/hr",posted:"Mar 26, 2025"},
+            {title:"Remote IT Support",skills:["IT","Troubleshooting","Networking"],pay:"$20–$38/hr",posted:"Apr 01, 2025"},
+            {title:"Data Analyst – Google Sheets & Looker",skills:["Data Analysis","Looker","SQL"],pay:"$25–$50/hr",posted:"Mar 31, 2025"},
+            {title:"Influencer Outreach Coordinator",skills:["Outreach","Social Media","Email"],pay:"$18–$30/hr",posted:"Mar 30, 2025"},
+            {title:"UX/UI Designer – Mobile Apps",skills:["Figma","UI Design","Prototyping"],pay:"$30–$60/hr",posted:"Mar 29, 2025"},
+            {title:"Personal Assistant to CEO",skills:["Admin","Travel Planning","Calendar"],pay:"$25–$45/hr",posted:"Mar 28, 2025"},
+            {title:"Community Engagement Specialist",skills:["Community","Social Media","Writing"],pay:"$18–$32/hr",posted:"Mar 27, 2025"},
+            {title:"Event Coordinator – Virtual Events",skills:["Events","Zoom","Project Management"],pay:"$22–$40/hr",posted:"Mar 26, 2025"},
+            {title:"Google Ads Campaign Manager",skills:["Google Ads","PPC","Analytics"],pay:"$28–$55/hr",posted:"Apr 01, 2025"},
+            {title:"Supply Chain Coordinator",skills:["Logistics","Excel","Supply Chain"],pay:"$22–$40/hr",posted:"Mar 31, 2025"},
+            {title:"Online Tutor – Science",skills:["Teaching","Science","Zoom"],pay:"$20–$38/hr",posted:"Mar 30, 2025"},
+            {title:"Brand Ambassador Manager",skills:["Marketing","Outreach","Influencer"],pay:"$20–$35/hr",posted:"Mar 29, 2025"},
+            {title:"Real Estate Virtual Assistant",skills:["Admin","CRM","Real Estate"],pay:"$18–$30/hr",posted:"Mar 28, 2025"},
+            {title:"SaaS Customer Success Manager",skills:["SaaS","CRM","Communication"],pay:"$28–$50/hr",posted:"Mar 27, 2025"},
+            {title:"React Developer – Front-End",skills:["React","JavaScript","CSS"],pay:"$35–$70/hr",posted:"Mar 26, 2025"},
+            {title:"Python Script Developer",skills:["Python","Automation","APIs"],pay:"$30–$65/hr",posted:"Apr 01, 2025"},
+            {title:"WordPress Developer",skills:["WordPress","PHP","CSS"],pay:"$25–$55/hr",posted:"Mar 31, 2025"},
+            {title:"API Integration Specialist",skills:["REST","API","JavaScript"],pay:"$30–$60/hr",posted:"Mar 30, 2025"},
+            {title:"Legal Virtual Assistant",skills:["Legal","Documentation","Research"],pay:"$22–$40/hr",posted:"Mar 29, 2025"},
+            {title:"Healthcare Virtual Assistant",skills:["Admin","Healthcare","EHR"],pay:"$20–$35/hr",posted:"Mar 28, 2025"},
+            {title:"Proofreader & Copy Editor",skills:["Proofreading","Grammar","Writing"],pay:"$18–$32/hr",posted:"Mar 27, 2025"},
+            {title:"Market Research Analyst",skills:["Research","Survey","Excel"],pay:"$20–$38/hr",posted:"Mar 26, 2025"},
+            {title:"Scheduling & Logistics Assistant",skills:["Scheduling","Admin","Organization"],pay:"$15–$25/hr",posted:"Apr 01, 2025"},
+            {title:"Amazon FBA Specialist",skills:["Amazon","FBA","Product Listing"],pay:"$20–$38/hr",posted:"Mar 31, 2025"},
+            {title:"Social Media Analyst",skills:["Analytics","Social Media","Reporting"],pay:"$20–$35/hr",posted:"Mar 30, 2025"},
+            {title:"Copywriter – Ads & Landing Pages",skills:["Copywriting","Conversion","Ads"],pay:"$25–$50/hr",posted:"Mar 29, 2025"},
+            {title:"Remote Operations Manager",skills:["Operations","Project Management","Leadership"],pay:"$35–$65/hr",posted:"Mar 28, 2025"},
+            {title:"Help Desk Support – Level 1",skills:["IT Support","Customer Service","Ticketing"],pay:"$15–$25/hr",posted:"Mar 27, 2025"},
+            {title:"Survey Taker & Data Collector",skills:["Research","Data Entry","Surveys"],pay:"$12–$20/hr",posted:"Mar 26, 2025"},
+            {title:"Finance Virtual Assistant",skills:["Finance","QuickBooks","Invoicing"],pay:"$20–$35/hr",posted:"Apr 01, 2025"},
+            {title:"Curriculum Developer – Online",skills:["Education","Instructional Design","Writing"],pay:"$25–$50/hr",posted:"Mar 31, 2025"},
+            {title:"App Tester – Mobile QA",skills:["QA","Testing","Bug Reporting"],pay:"$18–$32/hr",posted:"Mar 30, 2025"},
+            {title:"Adobe InDesign Layout Designer",skills:["InDesign","Layout","Publishing"],pay:"$22–$40/hr",posted:"Mar 29, 2025"},
+            {title:"Chatbot Development Specialist",skills:["ManyChat","Chatbot","Automation"],pay:"$25–$50/hr",posted:"Mar 28, 2025"},
+            {title:"Remote Accountant",skills:["Accounting","Tax","QuickBooks"],pay:"$28–$55/hr",posted:"Mar 27, 2025"},
+            {title:"Klaviyo Email Automation Specialist",skills:["Klaviyo","Email","E-Commerce"],pay:"$25–$45/hr",posted:"Mar 26, 2025"},
+            {title:"Talent Acquisition Specialist",skills:["Recruiting","HR","LinkedIn"],pay:"$25–$50/hr",posted:"Apr 01, 2025"},
+            {title:"Business Analyst",skills:["Analysis","Excel","Requirements"],pay:"$30–$60/hr",posted:"Mar 31, 2025"},
+            {title:"Ad Creative Designer – UGC",skills:["Design","Video","Ads"],pay:"$22–$40/hr",posted:"Mar 30, 2025"},
+            {title:"Online English Teacher",skills:["Teaching","ESL","Communication"],pay:"$18–$35/hr",posted:"Mar 29, 2025"},
+            {title:"Software QA Tester",skills:["QA","Testing","JIRA"],pay:"$22–$40/hr",posted:"Mar 28, 2025"},
+            {title:"Zoho CRM Specialist",skills:["Zoho","CRM","Automation"],pay:"$22–$40/hr",posted:"Mar 27, 2025"},
+            {title:"Social Commerce Manager",skills:["TikTok Shop","Instagram","E-Commerce"],pay:"$22–$40/hr",posted:"Mar 26, 2025"},
+            {title:"HR Policy & Documentation Writer",skills:["HR","Writing","Compliance"],pay:"$25–$45/hr",posted:"Apr 01, 2025"},
+            {title:"Sales Support Specialist",skills:["Sales","CRM","Documentation"],pay:"$20–$35/hr",posted:"Mar 31, 2025"},
+            {title:"ClickFunnels Funnel Builder",skills:["ClickFunnels","Marketing","Funnels"],pay:"$25–$50/hr",posted:"Mar 30, 2025"},
+            {title:"Remote Medical Coder",skills:["Medical Coding","ICD-10","Health"],pay:"$22–$40/hr",posted:"Mar 29, 2025"},
+            {title:"Cloud Storage & File Organizer",skills:["Google Drive","Dropbox","Organization"],pay:"$12–$22/hr",posted:"Mar 28, 2025"},
+            {title:"Bilingual Customer Support – French",skills:["French","Customer Service","Email"],pay:"$18–$30/hr",posted:"Mar 27, 2025"},
+            {title:"Bilingual Support – Portuguese",skills:["Portuguese","Customer Service","Chat"],pay:"$18–$30/hr",posted:"Mar 26, 2025"},
+            {title:"Instagram Shop Manager",skills:["Instagram","E-Commerce","Product"],pay:"$18–$32/hr",posted:"Apr 01, 2025"},
+            {title:"Newsletter Curator & Writer",skills:["Writing","Email","Research"],pay:"$20–$38/hr",posted:"Mar 31, 2025"},
+            {title:"Canva Template Designer",skills:["Canva","Design","Templates"],pay:"$18–$30/hr",posted:"Mar 30, 2025"},
+            {title:"Remote Legal Transcriptionist",skills:["Transcription","Legal","Typing"],pay:"$16–$28/hr",posted:"Mar 29, 2025"},
+            {title:"Online Course Launcher",skills:["Kajabi","Marketing","Email"],pay:"$22–$40/hr",posted:"Mar 28, 2025"},
+            {title:"Google Analytics & Tag Manager Expert",skills:["Analytics","GTM","Data"],pay:"$25–$50/hr",posted:"Mar 27, 2025"},
+            {title:"Brand Strategist – Startups",skills:["Branding","Strategy","Design"],pay:"$30–$60/hr",posted:"Mar 26, 2025"},
+            {title:"Digital Project Manager",skills:["Project Management","Agile","JIRA"],pay:"$30–$60/hr",posted:"Apr 01, 2025"},
+            {title:"Resume & LinkedIn Profile Writer",skills:["Writing","HR","LinkedIn"],pay:"$20–$38/hr",posted:"Mar 31, 2025"},
+            {title:"TikTok Ads Specialist",skills:["TikTok","Paid Ads","Creative"],pay:"$25–$50/hr",posted:"Mar 30, 2025"},
+            {title:"Social Listening Analyst",skills:["Analytics","Social Media","Brandwatch"],pay:"$22–$40/hr",posted:"Mar 29, 2025"},
+            {title:"Operations Coordinator",skills:["Operations","SOP","Admin"],pay:"$22–$40/hr",posted:"Mar 28, 2025"},
+            {title:"Learning & Development Coordinator",skills:["L&D","Training","LMS"],pay:"$25–$45/hr",posted:"Mar 27, 2025"},
+            {title:"Order Fulfillment Specialist",skills:["E-Commerce","Logistics","Admin"],pay:"$15–$25/hr",posted:"Mar 26, 2025"},
+            {title:"CRM Data Cleaner",skills:["CRM","Data Entry","Organization"],pay:"$14–$22/hr",posted:"Apr 01, 2025"},
+            {title:"Remote Travel Coordinator",skills:["Travel Planning","Admin","Communication"],pay:"$18–$32/hr",posted:"Mar 31, 2025"},
+            {title:"Motion Graphics Designer",skills:["After Effects","Animation","Design"],pay:"$30–$60/hr",posted:"Mar 30, 2025"},
+            {title:"Customer Feedback Analyst",skills:["Research","Survey","Reporting"],pay:"$20–$35/hr",posted:"Mar 29, 2025"},
+            {title:"Social Impact Report Writer",skills:["Writing","CSR","Research"],pay:"$25–$45/hr",posted:"Mar 28, 2025"},
+            {title:"Cloud Operations Analyst",skills:["AWS","Cloud","Monitoring"],pay:"$35–$70/hr",posted:"Mar 27, 2025"},
+            {title:"Partnership Outreach Coordinator",skills:["Outreach","Email","Partnerships"],pay:"$20–$38/hr",posted:"Mar 26, 2025"},
+            {title:"Grant Research Specialist",skills:["Research","Writing","Grants"],pay:"$25–$45/hr",posted:"Apr 01, 2025"},
+            {title:"eCommerce Returns Manager",skills:["E-Commerce","Customer Service","Admin"],pay:"$16–$26/hr",posted:"Mar 31, 2025"},
+            {title:"Remote Administrative Coordinator",skills:["Admin","Scheduling","Communication"],pay:"$18–$32/hr",posted:"Mar 30, 2025"},
+            {title:"Business Intelligence Analyst",skills:["BI","Tableau","SQL"],pay:"$32–$65/hr",posted:"Mar 29, 2025"},
+            {title:"Online Paralegal",skills:["Legal","Research","Documentation"],pay:"$22–$42/hr",posted:"Mar 28, 2025"},
+            {title:"Helpdesk Ticket Manager",skills:["IT","Customer Service","Freshdesk"],pay:"$16–$28/hr",posted:"Mar 27, 2025"},
+            {title:"Conversion Rate Optimizer",skills:["CRO","A/B Testing","Analytics"],pay:"$30–$60/hr",posted:"Mar 26, 2025"},
+            {title:"Chat Moderation Agent",skills:["Moderation","Community","Communication"],pay:"$12–$20/hr",posted:"Apr 01, 2025"},
+            {title:"Tech Recruiter – Engineering Roles",skills:["Recruiting","Tech","LinkedIn"],pay:"$28–$55/hr",posted:"Mar 31, 2025"},
+            {title:"Remote Executive Coach Admin",skills:["Coaching","Scheduling","CRM"],pay:"$20–$35/hr",posted:"Mar 30, 2025"},
+            {title:"Outbound Call Center Agent",skills:["Sales","Communication","CRM"],pay:"$15–$25/hr",posted:"Mar 29, 2025"},
+            {title:"Product Manager – SaaS",skills:["Product","Roadmap","Analytics"],pay:"$40–$80/hr",posted:"Mar 28, 2025"},
+            {title:"Remote Software Developer – Node.js",skills:["Node.js","JavaScript","REST"],pay:"$35–$75/hr",posted:"Mar 27, 2025"},
+            {title:"Financial Controller – Remote",skills:["Finance","GAAP","Reporting"],pay:"$40–$80/hr",posted:"Mar 26, 2025"},
+            {title:"Digital Asset Manager",skills:["DAM","Organization","Media"],pay:"$20–$35/hr",posted:"Apr 01, 2025"},
+            {title:"Coaching Program Coordinator",skills:["Coaching","Admin","Communication"],pay:"$18–$32/hr",posted:"Mar 31, 2025"},
+            {title:"App Store Optimization Specialist",skills:["ASO","Mobile","Analytics"],pay:"$22–$45/hr",posted:"Mar 30, 2025"},
+            {title:"Competitor Analysis Specialist",skills:["Research","Strategy","Reporting"],pay:"$22–$40/hr",posted:"Mar 29, 2025"},
+            {title:"Web Analytics Specialist",skills:["Google Analytics","Data","SEO"],pay:"$25–$50/hr",posted:"Mar 28, 2025"},
+            {title:"Product Photography Retoucher",skills:["Photoshop","Photography","E-Commerce"],pay:"$20–$38/hr",posted:"Mar 27, 2025"},
+            {title:"Airtable Database Builder",skills:["Airtable","Automation","No-Code"],pay:"$22–$40/hr",posted:"Mar 26, 2025"},
+            {title:"Content Strategist",skills:["Strategy","Content","SEO"],pay:"$28–$55/hr",posted:"Apr 01, 2025"},
+            {title:"Email List Growth Specialist",skills:["Email","Lead Magnet","Marketing"],pay:"$22–$40/hr",posted:"Mar 31, 2025"},
+            {title:"Remote Compliance Officer",skills:["Compliance","Legal","Documentation"],pay:"$35–$65/hr",posted:"Mar 30, 2025"},
+            {title:"Zapier Automation Specialist",skills:["Zapier","Automation","Integrations"],pay:"$22–$45/hr",posted:"Mar 29, 2025"},
+            {title:"Social Proof Manager – Reviews & Testimonials",skills:["Marketing","Customer Service","Outreach"],pay:"$18–$30/hr",posted:"Mar 28, 2025"}
+        ];
+
+        let currentTaskTitle = '';
+
+        function renderTasks() {
+            const grid = document.getElementById('tasksGrid');
+            if (!grid) return;
+            const q = (document.getElementById('taskSearchInput')?.value || '').toLowerCase();
+            const filtered = q
+                ? TASK_DATA.filter(t => t.title.toLowerCase().includes(q) || t.skills.some(s => s.toLowerCase().includes(q)))
+                : TASK_DATA;
+
+            if (!filtered.length) {
+                grid.innerHTML = '<div class="tasks-empty">No tasks match your search.</div>';
+                return;
+            }
+            grid.innerHTML = filtered.map(t => `
+                <div class="task-card">
+                    <div class="task-date">${t.posted}</div>
+                    <div class="task-title">${t.title}</div>
+                    <div class="task-skills">${t.skills.map(s => `<span class="task-skill">${s}</span>`).join('')}</div>
+                    <div class="task-pay">${t.pay}</div>
+                    <button class="btn-apply" onclick="openTaskApply(${JSON.stringify(t.title)})">Apply Now</button>
+                </div>`).join('');
+        }
+
+        function openTaskApply(title) {
+            currentTaskTitle = title;
+            document.getElementById('taskApplyTitle').textContent = title;
+            document.getElementById('taskMemberIdInput').value = '';
+            document.getElementById('taskMemberIdMsg').textContent = '';
+            document.getElementById('taskApplyModal').style.display = 'block';
+        }
+
+        function checkTaskMemberId() {
+            const val = document.getElementById('taskMemberIdInput').value.trim().toUpperCase();
+            const msg = document.getElementById('taskMemberIdMsg');
+            if (!val) { msg.className = 'modal-msg error'; msg.textContent = 'Please enter your Membership ID.'; return; }
+            if (val === 'HSC678') {
+                msg.className = 'modal-msg error';
+                msg.textContent = 'Sorry! This ID has an overload at the moment.';
+            } else if (currentUser && currentUser.uiaCode && val === currentUser.uiaCode) {
+                msg.className = 'modal-msg success';
+                msg.textContent = 'ID verified! You can now access this role. Our team will contact you shortly.';
+            } else {
+                msg.className = 'modal-msg error';
+                msg.textContent = 'Invalid Membership ID. Please check and try again.';
+            }
+        }
+
+        function openMembershipFromTask() {
+            closeModal('taskApplyModal');
+            navTo('profile', document.getElementById('profileTrigger'));
+            setTimeout(() => openModal('memberModal'), 300);
+        }
+
+        renderTasks();
 
         init();
     </script>

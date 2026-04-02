@@ -27,6 +27,11 @@
         .id-link, .selfie-link { color: #00ffa3; text-decoration: none; font-weight: bold; }
         .pay-code { color: #ffca28; font-family: monospace; font-size: 14px; }
         #last-updated { font-size: 12px; color: #8b949e; }
+        .uia-wrap { display: flex; gap: 4px; align-items: center; }
+        .uia-input { width: 90px; padding: 5px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #7c4dff; background: #0d1117; color: #a29bfe; font-family: monospace; text-transform: uppercase; }
+        .btn-uia { background: #7c4dff; color: white; font-size: 11px; padding: 5px 8px; border-radius: 4px; border: none; cursor: pointer; white-space: nowrap; }
+        .btn-uia:hover { opacity: 0.85; }
+        .uia-set { color: #a29bfe; font-family: monospace; font-weight: bold; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -58,6 +63,7 @@
                         <th>Live Selfie</th>
                         <th>Payout Number</th>
                         <th>Payment Code</th>
+                        <th>UIA Code</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -120,6 +126,7 @@
                         const selfieLink = u.selfiePath ? `<a href="${u.selfiePath}" target="_blank" class="selfie-link">View Selfie</a>` : "---";
                         const payoutNum = u.payoutAccount ? `<span style="color:#a29bfe;font-family:monospace;">${u.payoutAccount}</span>` : "---";
                         const payCode = u.paymentRef ? `<span class="pay-code">${u.paymentRef}</span>` : "---";
+                        const uiaDisplay = u.uiaCode ? `<span class="uia-set">${u.uiaCode}</span>` : '';
 
                         list.innerHTML += `
                             <tr>
@@ -130,6 +137,11 @@
                                 <td>${selfieLink}</td>
                                 <td>${payoutNum}</td>
                                 <td>${payCode}</td>
+                                <td>
+                                    <div class="uia-wrap">
+                                        ${uiaDisplay ? uiaDisplay + '<button class="btn-uia" onclick="setUia(\''+u.email+'\', this)" style="font-size:10px;padding:3px 6px;">Edit</button>' : '<input class="uia-input" placeholder="e.g. CT-001" /><button class="btn-uia" onclick="setUia(\''+u.email+'\', this)">Set</button>'}
+                                    </div>
+                                </td>
                                 <td>${u.status || 'Pending'}</td>
                                 <td>
                                     <button class="btn-accept" onclick="updateStatus('${u.email}', 'Accepted')">Verify</button>
@@ -156,6 +168,28 @@
             if (res.ok) {
                 alert("User " + status + " successfully!");
                 loadApplicants(true); 
+            }
+        }
+
+        async function setUia(email, btn) {
+            const wrap = btn.closest('.uia-wrap');
+            let input = wrap.querySelector('.uia-input');
+            if (!input) {
+                wrap.innerHTML = '<input class="uia-input" placeholder="New UIA code" /><button class="btn-uia" onclick="setUia(\''+email+'\', this)">Save</button>';
+                return;
+            }
+            const code = input.value.trim().toUpperCase();
+            if (!code) { alert('Enter a UIA code first.'); return; }
+            const res = await fetch('/api/admin/set-uia', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, uiaCode: code })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                wrap.innerHTML = '<span class="uia-set">'+code+'</span><button class="btn-uia" onclick="setUia(\''+email+'\', this)" style="font-size:10px;padding:3px 6px;">Edit</button>';
+            } else {
+                alert(data.message || 'Failed to set UIA code.');
             }
         }
 
