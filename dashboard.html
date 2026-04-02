@@ -48,7 +48,7 @@
         .hamburger {
             display: none;
             position: fixed;
-            top: 16px; right: 16px; left: auto;
+            top: 16px; left: 16px; right: auto;
             z-index: 200;
             background: var(--primary);
             border: none; color: white;
@@ -58,6 +58,23 @@
             cursor: pointer;
             align-items: center; justify-content: center;
         }
+
+        /* Home page top navigation bar */
+        .home-nav { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+        .home-nav-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #e0e0e0; padding: 10px 22px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: 0.2s; letter-spacing: 0.3px; }
+        .home-nav-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
+
+        /* Info section cards (payouts / rules) */
+        .info-section { margin-top: 32px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 32px 30px; }
+        .info-section h2 { margin: 0 0 16px; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .info-section h2 i { color: var(--primary); }
+        .info-section p { color: #b0b0b0; line-height: 1.78; font-size: 0.92rem; margin: 0 0 10px; }
+        .info-section p:last-child { margin-bottom: 0; }
+        .info-section .rules-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+        .info-section .rules-list li { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 18px; color: #b0b0b0; font-size: 0.92rem; line-height: 1.65; }
+        .info-section .rules-list li strong { color: #ff6b6b; }
+        .info-section .note-box { background: rgba(255,202,40,0.08); border: 1px solid rgba(255,202,40,0.3); border-radius: 10px; padding: 14px 18px; margin-top: 14px; color: #ffca28; font-size: 0.88rem; line-height: 1.7; }
+        .info-section .note-box strong { font-weight: 700; }
 
         /* UIA code badge in sidebar */
         .sidebar-uia { font-size: 12px; color: #a29bfe; font-family: monospace; font-weight: bold; margin-bottom: 20px; display: none; letter-spacing: 1px; }
@@ -394,11 +411,18 @@
 
         <!-- HOME -->
         <div id="home" class="view-section active">
+
+            <!-- HOME TOP NAV -->
+            <div class="home-nav">
+                <button class="home-nav-btn" onclick="navTo('profile', document.getElementById('profileTrigger'))"><i class="fa-solid fa-user-circle" style="margin-right:6px;"></i>User Profile</button>
+                <button class="home-nav-btn" onclick="scrollToSection('aboutUsSection')"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>About Us</button>
+                <button class="home-nav-btn" onclick="scrollToSection('opportunitiesSection')"><i class="fa-solid fa-briefcase" style="margin-right:6px;"></i>Opportunities</button>
+            </div>
+
             <div class="home-header">
                 <div class="section-tag">CloudTasks in association with WellFounds <img src="https://flagcdn.com/24x18/us.png" alt="USA" style="vertical-align:middle;margin-left:4px;border-radius:2px;"></div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
-                <h6>  your Go-To choice for flexible, borderless & No-TimeBound work performance</h6>
-                
+                <h6>your Go-To choice for flexible, borderless &amp; No-TimeBound work performance</h6>
                 <p style="color:#888;margin:0;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
                 <button onclick="navTo('profile', document.getElementById('profileTrigger'))" style="margin-top:20px;background:var(--primary);border:none;color:white;padding:14px 36px;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,77,255,0.4);transition:0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Started</button>
             </div>
@@ -421,30 +445,53 @@
             </div>
 
             <!-- ABOUT US SECTION -->
-            <div style="margin-top:40px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px 32px;">
-                <h2 style="margin:0 0 18px;font-size:1.4rem;font-weight:700;">About Us: Connecting Global Ambition with Local Talent</h2>
-                <h3 style="color:var(--primary);font-size:1rem;margin:0 0 8px;">Our Mission</h3>
-                <p style="color:#b0b0b0;line-height:1.75;margin:0 0 18px;font-size:0.93rem;">At Cloudtasks, we believe that quality work shouldn't be limited by borders. Our mission is to bridge the gap between forward-thinking companies and a curated community of skilled professionals. We simplify the outsourcing process by ensuring that every task, no matter how small, is handled with precision and professional integrity.</p>
-                <h3 style="color:var(--primary);font-size:1rem;margin:0 0 8px;">What We Do</h3>
-                <p style="color:#b0b0b0;line-height:1.75;margin:0 0 8px;font-size:0.93rem;">We act as the essential intermediary in the remote work ecosystem.</p>
-                <ul style="color:#b0b0b0;line-height:1.9;margin:0 0 18px;padding-left:20px;font-size:0.93rem;">
+            <div id="aboutUsSection" class="info-section" style="margin-top:40px;">
+                <h2><i class="fa-solid fa-circle-info"></i> About Us: Connecting Global Ambition with Local Talent</h2>
+                <h3 style="color:var(--primary);font-size:0.95rem;margin:0 0 6px;font-weight:700;">Our Mission</h3>
+                <p>At Cloudtasks, we believe that quality work shouldn't be limited by borders. Our mission is to bridge the gap between forward-thinking companies and a curated community of skilled professionals. We simplify the outsourcing process by ensuring that every task, no matter how small, is handled with precision and professional integrity.</p>
+                <h3 style="color:var(--primary);font-size:0.95rem;margin:14px 0 6px;font-weight:700;">What We Do</h3>
+                <p>We act as the essential intermediary in the remote work ecosystem.</p>
+                <ul style="color:#b0b0b0;line-height:1.9;margin:0 0 10px;padding-left:20px;font-size:0.92rem;">
                     <li><strong style="color:#fff;">For Companies:</strong> We provide a streamlined gateway to outsource complex or high-volume tasks without the overhead of traditional hiring.</li>
                     <li><strong style="color:#fff;">For Service Providers:</strong> We offer a platform where skill meets opportunity, allowing vetted professionals to access meaningful work from global clients.</li>
                 </ul>
-                <h3 style="color:var(--primary);font-size:1rem;margin:0 0 8px;">The Cloudtasks Standard: Vetted &amp; Verified</h3>
-                <p style="color:#b0b0b0;line-height:1.75;margin:0 0 8px;font-size:0.93rem;">What sets us apart is our commitment to quality. We don't just "link" people; we curate excellence.</p>
-                <ul style="color:#b0b0b0;line-height:1.9;margin:0 0 18px;padding-left:20px;font-size:0.93rem;">
-                    <li><strong style="color:#fff;">Rigorous Vetting:</strong> Every service provider on our platform undergoes a multi-stage verification process to ensure they possess the technical skills required for the job.</li>
-                    <li><strong style="color:#fff;">Quality Assurance:</strong> We monitor output and maintain strict standards, so companies can trust that their projects are in safe hands.</li>
-                    <li><strong style="color:#fff;">Secure Logistics:</strong> With integrated, reliable payment systems and clear communication channels, we remove the friction often found in remote collaborations.</li>
+                <h3 style="color:var(--primary);font-size:0.95rem;margin:14px 0 6px;font-weight:700;">The Cloudtasks Standard: Vetted &amp; Verified</h3>
+                <p>What sets us apart is our commitment to quality. We don't just "link" people; we curate excellence.</p>
+                <ul style="color:#b0b0b0;line-height:1.9;margin:0 0 10px;padding-left:20px;font-size:0.92rem;">
+                    <li><strong style="color:#fff;">Rigorous Vetting:</strong> Every service provider on our platform undergoes a multi-stage verification process.</li>
+                    <li><strong style="color:#fff;">Quality Assurance:</strong> We monitor output and maintain strict standards, so companies can trust their projects are in safe hands.</li>
+                    <li><strong style="color:#fff;">Secure Logistics:</strong> Integrated, reliable payment systems and clear communication channels remove friction from remote collaborations.</li>
                 </ul>
-                <h3 style="color:var(--primary);font-size:1rem;margin:0 0 8px;">Why Choose Us?</h3>
-                <p style="color:#b0b0b0;line-height:1.75;margin:0 0 6px;font-size:0.93rem;">In a world full of "gig" websites, Cloudtasks stands for accountability. We take the guesswork out of outsourcing. When a company brings a project to us, they aren't just getting a worker—they are getting a verified solution. When a provider joins us, they aren't just finding a job—they are joining a community of professionals.</p>
-                <p style="color:#b0b0b0;line-height:1.75;margin:0;font-size:0.93rem;font-style:italic;">Join us as we redefine the future of remote efficiency.</p>
+                <h3 style="color:var(--primary);font-size:0.95rem;margin:14px 0 6px;font-weight:700;">Why Choose Us?</h3>
+                <p>In a world full of "gig" websites, Cloudtasks stands for accountability. We take the guesswork out of outsourcing. When a company brings a project to us, they aren't just getting a worker — they are getting a verified solution. When a provider joins us, they aren't just finding a job — they are joining a community of professionals.</p>
+                <p style="font-style:italic;">Join us as we redefine the future of remote efficiency.</p>
             </div>
 
-            <!-- TASKS SECTION -->
-            <div class="tasks-section">
+            <!-- HOW PAYOUTS ARE DONE -->
+            <div class="info-section">
+                <h2><i class="fa-solid fa-money-bill-wave"></i> How Payouts Are Done</h2>
+                <p>Cloudtasks makes payments and payouts as seamless as possible by partnering with selected local merchants to ease the process of handling payments. As different countries have different payment systems preferred by the majority of their citizens, all billings and settlements will be done through selected local merchants to ensure that you receive your payouts in your local currency — based on the country you input in your user profile — and credited to the account or mobile number you provided in your user profile.</p>
+                <p><strong style="color:#fff;">Intermediary / Referral Payouts</strong> are made within <strong style="color:#fff;">1–2 business days</strong> when the referred persons are approved.</p>
+                <p><strong style="color:#fff;">Task Payouts</strong> are made within <strong style="color:#fff;">1–5 business days</strong> after we cross-check the submitted task and the client approves your submitted work.</p>
+                <div class="note-box">
+                    <strong>NOTE!</strong> To earn from Intermediary / Referral, the person you invite must input your <strong>UIA Code</strong> under the UIA input when registering and successfully complete their Membership Application, so that the system schedules you for the payout through the local merchant.
+                </div>
+            </div>
+
+            <!-- CLOUDTASKS RULES -->
+            <div class="info-section">
+                <h2><i class="fa-solid fa-shield-halved"></i> CloudTasks Rules</h2>
+                <p style="margin-bottom:16px;">The following are <strong style="color:#ff6b6b;">not allowed</strong> on our platform:</p>
+                <ul class="rules-list">
+                    <li><strong>Rule 1 — No False Identity:</strong> Use of false identity details is strictly prohibited. If reviewed and found to contain false details, your account will be permanently revoked.</li>
+                    <li><strong>Rule 2 — No Proxies or VPNs:</strong> No use of proxies or VPNs while undertaking our tasks. Cloudtasks gives every citizen an opportunity to use native accounts, and for credibility of our work, no interference of IPs will be tolerated.</li>
+                    <li><strong>Rule 3 — Membership ID Limit:</strong> One Membership ID is only limited to 5 users at a time. If the system keeps detecting an overload error on your account, you may face a permanent ban.</li>
+                    <li><strong>Rule 4 — No Disclosure of Client Projects:</strong> Do not disclose clients' projects to third parties. Only verified members should handle assigned tasks and projects, unless the task is not marked as classified.</li>
+                </ul>
+            </div>
+
+            <!-- TASKS / OPPORTUNITIES SECTION -->
+            <div id="opportunitiesSection" class="tasks-section">
                 <h2 style="margin-bottom:6px;font-weight:600;">Available Remote Roles</h2>
                 <p style="color:#666;font-size:13px;margin-bottom:16px;">Browse 150+ remote opportunities — verified members get full access.</p>
                 <div class="tasks-search">
@@ -1153,6 +1200,11 @@ if (!token) {
             wipeState();
             const target = document.getElementById(id);
             if (target) { target.classList.add('active'); el.classList.add('active'); }
+        }
+
+        function scrollToSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function navLock(title, el) {
