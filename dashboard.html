@@ -60,7 +60,7 @@
         }
 
         /* Home page top navigation bar */
-        .home-nav { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; justify-content: flex-end; }
+        .home-nav { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: nowrap; justify-content: space-evenly; }
         .home-nav-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #e0e0e0; padding: 10px 22px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: 0.2s; letter-spacing: 0.3px; }
         .home-nav-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
 
@@ -412,7 +412,10 @@
         <!-- HOME -->
         <div id="home" class="view-section active">
 
-            <!-- HOME TOP NAV -->
+            <!-- TOPMOST: ASSOCIATION TAG -->
+            <div class="section-tag" style="margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:6px;">CloudTasks in association with WellFounds <img src="https://flagcdn.com/24x18/us.png" alt="USA" style="vertical-align:middle;border-radius:2px;"> USA</div>
+
+            <!-- HOME TOP NAV — evenly spaced on one line -->
             <div class="home-nav">
                 <button class="home-nav-btn" onclick="navTo('profile', document.getElementById('profileTrigger'))"><i class="fa-solid fa-user-circle" style="margin-right:6px;"></i>User Profile</button>
                 <button class="home-nav-btn" onclick="scrollToSection('aboutUsSection')"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>About Us</button>
@@ -420,10 +423,8 @@
             </div>
 
             <div class="home-header">
-                <div class="section-tag">CloudTasks in association with WellFounds <img src="https://flagcdn.com/24x18/us.png" alt="USA" style="vertical-align:middle;margin-left:4px;border-radius:2px;"></div>
                 <h1 style="margin:8px 0;">Welcome to CloudTasks</h1>
-                <p style="color:#888;margin:0;">your Go-To choice for flexible, borderless &amp; No-TimeBound work performance</p>
-                
+                <p style="color:#888;margin:0 0 6px;">Your go-to choice for flexible, borderless &amp; no-time-bound remote work.</p>
                 <p style="color:#888;margin:0;">Go to <strong style="color:white;">User Profile</strong> to complete your details and get verified.</p>
                 <button onclick="navTo('profile', document.getElementById('profileTrigger'))" style="margin-top:20px;background:var(--primary);border:none;color:white;padding:14px 36px;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,77,255,0.4);transition:0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Started</button>
             </div>
@@ -869,7 +870,7 @@ if (!token) {
                     _set('lastName', parts.slice(1).join(' ') || '');
                 }
                 _set('pNumber', currentUser.phoneNumber);
-                _set('referralCode', currentUser.referralCode);
+                _set('uiaCode', currentUser.referralCode);
                 _set('payoutAccount', currentUser.payoutAccount);
                 if (currentUser.education) { const el = document.getElementById('eduLevel'); if (el) el.value = currentUser.education; }
                 if (currentUser.paymentMethod) { const el = document.getElementById('paymentMethod'); if (el) el.value = currentUser.paymentMethod; }
@@ -957,11 +958,11 @@ if (!token) {
             const first = document.getElementById('firstName').value.trim();
             const last = document.getElementById('lastName').value.trim();
             fd.append('fullName', (first + ' ' + last).trim());
-            fd.append('nationalIdNo', document.getElementById('nationalIdNo').value.trim());
             const prefix = document.getElementById('phonePrefix').value;
             const num = document.getElementById('pNumber').value.trim();
             fd.append('phoneNumber', prefix ? prefix + num : num);
-            fd.append('referralCode', document.getElementById('referralCode').value.trim());
+            const uiaInput = document.getElementById('uiaCode');
+            if (uiaInput) fd.append('referralCode', uiaInput.value.trim());
             await postFormData(fd, 'personalMsg');
         }
 
