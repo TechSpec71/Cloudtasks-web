@@ -574,7 +574,7 @@
                     <div class="number-tag">05</div>
                     <div class="card-icon"><i class="fa-solid fa-layer-group"></i></div>
                     <h3>Task / Member Access</h3>
-                    <p>Activate membership to unlock tasks.</p>
+                    <p>Activate membership to access tasks.</p>
                     <button class="btn-update" onclick="openModal('memberModal')">GET ACCESS</button>
                 </div>
 
@@ -630,7 +630,7 @@
                 <input type="text" id="phonePrefix" class="prefix-box" placeholder="+..." readonly>
                 <input type="text" id="pNumber" placeholder="Phone Number">
             </div>
-            <input type="text" id="referralCode" placeholder="Referral Code (optional)">
+            <input type="text" id="uiaCode" placeholder="UIA Code (optional)">
             <button class="btn-update" style="margin-top:15px;" onclick="savePersonal()">Save Changes</button>
             <div class="modal-msg" id="personalMsg"></div>
             <button class="btn-cancel" onclick="closeModal('personalModal')">Cancel</button>
@@ -686,7 +686,7 @@
             <h2>Payout Details</h2>
             <h6>NOTE: this should be the account that will receive payments for your Task earnings and Referral earnings,confirm to ensure it's accurate</h6>
             <select id="paymentMethod">
-                <option value="">Select Payment Method</option>
+                <h3>Select Payment Method</h3>
                 <option value="Bank Transfer">Bank Transfer</option>
                 <option value="Mobile Money">Mobile Money</option>
             </select>
@@ -737,7 +737,7 @@
                     <button class="pay-btn-other" onclick="showNotActive(event)"><i class="fa-brands fa-stripe-s"></i> Stripe</button>
                     <button class="pay-btn-other" onclick="showNotActive(event)">Airwallex</button>
                     <button class="pay-btn-other" onclick="showNotActive(event)"><i class="fa-brands fa-bitcoin"></i> Binance</button>
-                    <button class="pay-btn-other" onclick="showNotActive(event)">More...</button>
+                    <button class="pay-btn-other" onclick="showNotActive(event)">Ali Pay</button>
                 </div>
 
                 <button class="btn-cancel" onclick="closeModal('memberModal')" style="margin-top:16px;">Cancel</button>
@@ -770,8 +770,9 @@
                     <div id="convertedResult" style="margin-top:10px;font-size:1.05rem;color:var(--success);font-weight:bold;min-height:24px;text-align:center;"></div>
                 </div>
 
-                <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your account will be reviewed and an email sent to you upon approval.</p>
-                <button class="btn-cancel" onclick="closeModal('memberModal')">Cancel</button>
+                <p style="font-size:0.75rem;color:#ffb800;margin-top:14px;text-align:center;">* Your application will be reviewed, upon approval your UIA code will be updated on the top left of your homepage.</p>
+                <h5>NOTE:The UIA code is different from Membership ID .UIA is your unique referee code that you can earn from, when other users use it when they apply for membership, Membership ID will be issued after Assessment interview</h5>
+        <button class="btn-cancel" onclick="closeModal('memberModal')">Cancel</button>
             </div>
 
         </div>
